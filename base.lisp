@@ -1,6 +1,6 @@
 ; Título: Juego Laberinto LISP
 ; Autor: Marcos Socías Alberto
-; Fecha última modificación: 31/03/2025
+; Fecha última modificación: 01/04/2025
 
 (setq xi 10)
 (setq yi 10)
@@ -38,9 +38,10 @@
     (cond
         ((null l) nil)
         (t 
+            ; pintar casilla
             (apply 'color (get 'colors (car l)))
             (quadrat (- m 1))
-            (moverel m 0)
+            ; pintar jugador
             (cond
                 ((= p 0) 
                     (apply 'color (get 'colors 'cian))
@@ -49,6 +50,8 @@
                     (moverel -2 -2)
                 )
             )
+            ; siguiente casilla
+            (moverel m 0)
             (pinta (cdr l) (- p 1))
         )
     )
@@ -60,38 +63,41 @@
 
 (defun esquerra (p)
     (cond
-        ((< 0 (- p 1)) (+ p 4))
-        (t (mod (+ p 1) 5))
+        ((< (- p 1) 0) (+ p 4))
+        (t (mod (- p 1) 5))
     )
 )
 
+;(defun amunt (p)
+
+;)
+
+;(defun abaix (p)
+
+;)
+
 (defun passa (l p)
+    (cls)
+    (move xi yi)
     (pinta l p)
     (cond
-        ((apply '/= '0 'l) l)
+        ((every '/= '(0 0 0 0 0) (get 'colors (car l))) l)
         (t 
+            (setq tecla (get-key))
             (cond
-                ; si la tecla pulsada es a
-                (() ad l (esquerra p))
-                ; si la tecla pulsada es d
-                (() ad l (dreta p))
+                ; si la tecla pulsada es A o <-
+                ((or (= 65 tecla) (= 97 tecla) (= 331 tecla)) (passa l (esquerra p)))
+                ; si la tecla pulsada es D o ->
+                ((or (= 68 tecla) (= 100 tecla) (= 333 tecla)) (passa l (dreta p)))
                 ; si la tecla pulsada es 0-3
-                (() numero (canvia l p tecla))
+                ((<= 48 tecla 51) (passa (canvia l p tecla) p))
                 ; si la tecla pulsada es ESC
-                (() l)
+                ((= 27 tecla) l)
+                ; si no, se llama recursivamente tal cual
+                (t (passa l p))
             )
         )
     )
 )
 
-(defun ad (l p)
-
-)
-
-(defun numero (l p)
-
-)
-
-(cls)
-(move xi yi)
 (passa l p)
