@@ -5,7 +5,9 @@
 (setq xi 10)
 (setq yi 10)
 (setq m 25)
-(setq p 2)
+(setq p '(2 2))
+(setq lWidth 10)
+(setq lHeigh 10)
 
 (putprop 'colors '(0 0 0) 'negro)
 
@@ -58,13 +60,13 @@
 )
 
 (defun dreta (p)
-    (mod (+ p 1) 5)
+    (mod (+ (car p) 1) lWidth)
 )
 
 (defun esquerra (p)
     (cond
-        ((< (- p 1) 0) (+ p 4))
-        (t (mod (- p 1) 5))
+        ((< (- (car p) 1) 0) (+ (car p) 4))
+        (t (mod (- (car p) 1) lWidth))
     )
 )
 
@@ -85,10 +87,14 @@
         (t 
             (setq tecla (get-key))
             (cond
-                ; si la tecla pulsada es A o <-
+                ; si la tecla pulsada es A o flecha izquierda
                 ((or (= 65 tecla) (= 97 tecla) (= 331 tecla)) (passa l (esquerra p)))
-                ; si la tecla pulsada es D o ->
+                ; si la tecla pulsada es D o flecha derecha
                 ((or (= 68 tecla) (= 100 tecla) (= 333 tecla)) (passa l (dreta p)))
+                ; si la tecla pulsada es W o flecha arriba
+                ((or (= 87 tecla) (= 119 tecla) (= 328 tecla)) (passa l (amunt p)))
+                ; si la tecla pulsada es S o flecha abajo
+                ((or (= 83 tecla) (= 115 tecla) (= 336 tecla)) (passa l (abaix p)))
                 ; si la tecla pulsada es 0-3
                 ((<= 48 tecla 51) (passa (canvia l p tecla) p))
                 ; si la tecla pulsada es ESC
