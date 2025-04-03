@@ -7,7 +7,7 @@
 (setq m 25)
 (setq p '(2 2))
 (setq lWidth 10)
-(setq lHeigh 10)
+(setq lHeight 10)
 
 (putprop 'colors '(0 0 0) 'negro)
 
@@ -20,7 +20,11 @@
 (putprop 'colors '(0 255 255) 'cian)
 
 
-(setq l (list 'negro 'negro 'negro 'negro 'negro))
+(setq l (list '('negro 'negro 'negro 'negro 'negro)
+              '('negro 'negro 'negro 'negro 'negro)
+              '('negro 'negro 'negro 'negro 'negro)
+              '('negro 'negro 'negro 'negro 'negro)
+              '('negro 'negro 'negro 'negro 'negro)))
 
 (defun quadrat (x) 
     (drawrel x 0)
@@ -41,11 +45,11 @@
         ((null l) nil)
         (t 
             ; pintar casilla
-            (apply 'color (get 'colors (car l)))
+            (apply 'color (get 'colors (car (car l))))
             (quadrat (- m 1))
             ; pintar jugador
             (cond
-                ((= p 0) 
+                ((and (= (car p) 0) (= (cdr p) 0)) 
                     (apply 'color (get 'colors 'cian))
                     (moverel 2 2)
                     (quadrat (- m 5))
@@ -54,7 +58,7 @@
             )
             ; siguiente casilla
             (moverel m 0)
-            (pinta (cdr l) (- p 1))
+            (pinta (cdr (cdr l)) (- (car p) 1))
         )
     )
 )
@@ -65,18 +69,21 @@
 
 (defun esquerra (p)
     (cond
-        ((< (- (car p) 1) 0) (+ (car p) 4))
+        ((< (- (car p) 1) 0) (+ (car p) (- lWidth 1)))
         (t (mod (- (car p) 1) lWidth))
     )
 )
 
-;(defun amunt (p)
+(defun amunt (p)
+    (mod (+ (cdr p) 1) lHeight)
+)
 
-;)
-
-;(defun abaix (p)
-
-;)
+(defun abaix (p)
+    (cond
+        ((< (- (cdr p) 1) 0) (+ (cdr p) (- lHeight 1)))
+        (t (mod (- (cdr p) 1) lHeight))
+    )
+)
 
 (defun passa (l p)
     (cls)
