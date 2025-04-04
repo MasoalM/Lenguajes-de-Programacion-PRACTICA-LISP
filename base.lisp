@@ -4,13 +4,15 @@
 
 (setq xi 10)
 (setq yi 10)
-(setq m 25)
-(setq px 2)
-(setq py 2)
-(setq lWidth 10)
-(setq lHeight 10)
+(setq m 14)
+(setq px 10)
+(setq py 10)
+(setq lWidth 25)
+(setq lHeight 25)
 
-(putprop 'colors '(0 0 0) 'negro)
+(putprop 'colors '(0 0 0) 'paret)
+
+(putprop 'colors '(255 255 255) 'cami)
 
 (putprop 'colors '(255 0 0) 'rojo)
 
@@ -18,25 +20,50 @@
 
 (putprop 'colors '(0 0 255) 'azul)
 
-;(putprop 'colors '(0 255 255) 'cian)
+
+(setq l (list '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret cami cami paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret cami cami cami paret paret paret cami paret paret paret paret paret paret paret paret paret paret paret)  ; HACERLO ÓPTIMO
+              '(paret paret paret paret paret paret paret paret paret cami paret paret paret cami paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret cami cami cami cami cami paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
+              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)))
 
 
-(setq l (list '(negro negro negro negro negro negro negro negro negro negro)    ; HACERLO AUTOMÁTICO
-              '(negro negro negro negro negro negro negro negro negro negro)
-              '(negro negro negro negro negro negro negro negro negro negro) 
-              '(negro negro negro negro negro negro negro negro negro negro)    ; HACERLO AUTOMÁTICO
-              '(negro negro negro negro negro negro negro negro negro negro)
-              '(negro negro negro negro negro negro negro negro negro negro)
-              '(negro negro negro negro negro negro negro negro negro negro)    ; HACERLO AUTOMÁTICO
-              '(negro negro negro negro negro negro negro negro negro negro)
-              '(negro negro negro negro negro negro negro negro negro negro)
-              '(negro negro negro negro negro negro negro negro negro negro)))
+;(defun quadrat (x)
+;    (drawrel x 0)
+;    (drawrel 0 x);
+;    (drawrel (- x) 0)
+;    (drawrel 0 (- x))
+;    (cond
+;        ((/= x 0) (quadrat (- x 1)))
+;    )
+;)
 
-(defun quadrat (x)
-    (drawrel x 0)
-    (drawrel 0 x)
-    (drawrel (- x) 0)
-    (drawrel 0 (- x))
+(defun quadrat (x m)
+    (drawrel 0 m)
+    (moverel 1 (- m))
+    (cond
+        ((> x 0) (quadrat (- x 1) m))
+        (t (moverel (- m) 0))
+    )
 )
 
 (defun columna-quadrats (n l px py)
@@ -45,26 +72,18 @@
         (t
             (apply 'color (get 'colors (car l)))    ; TOO FEW ARGUMENTS: Falla cuando hago (apply 'color (get 'colors (car l)))
             (moverel 0 m)
-            (quadrat (- m 1))
+            (quadrat (- m 1) m)
             ; pintar (o no) al jugador
             (cond
                 ((and (= px 0) (= py 0)) 
                     (apply 'color (get 'colors 'verde))
                     (moverel 2 2)
-                    (quadrat (- m 5))
+                    (quadrat (- m 5) (- m 4))
                     (moverel -2 -2)
                 )
             )
             (columna-quadrats (- n 1) (cdr l) px (- py 1))
         )
-    )
-)
-
-; SIN ADAPTAR AL 2D
-(defun canvia (l i v)
-    (cond
-        ((= i 0) ((cons v (cdr l))))
-        (t (cons (car l) (canvia (cdr l) (- i 1) v)))
     )
 )
 
@@ -79,6 +98,8 @@
         )
     )
 )
+
+; CREAR FUNCIÓN "obtenir-posicio" QUE OBTIENE EL COLOR DE UNA POSICIÓN A PARTIR DE PX y PY
 
 (defun dreta (px)
     (mod (+ px 1) lWidth)
@@ -116,8 +137,6 @@
         ((or (= 87 tecla) (= 119 tecla) (= 328 tecla)) (passa l px (amunt py)))
         ; si la tecla pulsada es S o flecha abajo
         ((or (= 83 tecla) (= 115 tecla) (= 336 tecla)) (passa l px (abaix py)))
-        ; si la tecla pulsada es 0-3
-        ;((<= 48 tecla 51) (passa (canvia l p tecla) p)) ; SIN ADAPTAR A 2D
         ; si la tecla pulsada es ESC
         ((= 27 tecla) l)
         ; si no, se llama recursivamente tal cual
