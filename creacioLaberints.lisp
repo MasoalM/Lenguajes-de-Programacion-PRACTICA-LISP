@@ -16,6 +16,7 @@
 ; algoritmo DFS
 (defun crea-cami (l x y)
     ; moverme en posición random y modificar x e y según donde vaya avanzando
+    
 )
 
 (defun crea-matriu (x y)
