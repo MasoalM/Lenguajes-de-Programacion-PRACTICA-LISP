@@ -66,12 +66,12 @@
     )
 )
 
-(defun columna-quadrats (n l px py)
+(defun fila-quadrats (n l px py)
     (cond
         ((= n 0) nil)
         (t
             (apply 'color (get 'colors (car l)))    ; TOO FEW ARGUMENTS: Falla cuando hago (apply 'color (get 'colors (car l)))
-            (moverel 0 m)
+            (moverel m 0)
             (quadrat (- m 1) m)
             ; pintar (o no) al jugador
             (cond
@@ -82,7 +82,7 @@
                     (moverel -2 -2)
                 )
             )
-            (columna-quadrats (- n 1) (cdr l) px (- py 1))
+            (fila-quadrats (- n 1) (cdr l) (- px 1) py)
         )
     )
 )
@@ -91,10 +91,10 @@
     (cond
         ((null l) nil)
         (t 
-            (columna-quadrats lHeight (car l) px py)
-            ; siguiente columna
-            (moverel m (- (* m lHeight)))
-            (pinta (cdr l) (- px 1) py)
+            (fila-quadrats lWidth (car l) px py)
+            ; siguiente fila
+            (moverel (- (* m lWidth)) m)
+            (pinta (cdr l) px (- py 1))
         )
     )
 )

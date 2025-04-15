@@ -9,8 +9,13 @@
     ; abrir fichero en modo escribir
     ; let de nombre f al fichero
     ; (escribir f (crea-matriu ...))
-    (crea-matriu lWidth lHeight)
+    
+    (crea-cami (crea-matriu lWidth lHeight) actualX actualY)
+)
 
+; algoritmo DFS
+(defun crea-cami (l x y)
+    ; moverme en posición random y modificar x e y según donde vaya avanzando
 )
 
 (defun crea-matriu (x y)
