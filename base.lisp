@@ -1,14 +1,14 @@
 ; Título: Juego Laberinto LISP
-; Autor: Marcos Socías Alberto
+; Autores : Marcos Socías Alberto y Hugo Valls Sabater
 ; Fecha última modificación: 04/04/2025
 
-(setq xi 10)
-(setq yi 10)
-(setq m 14)
-(setq px 10)
-(setq py 10)
-(setq lWidth 25)
-(setq lHeight 25)
+(setq xi 10) ; posicion x donde empieza a pintar
+(setq yi 10) ; posicion y donde empieza a pintar 
+(setq m 14)  ; tamaño de un cuadrado
+(setq px 10) ; posicion inicial x en la matriz del jugador   
+(setq py 10) ; posicion inicial y en la matriz del jugador
+(setq lWidth 25) ; anchura en cuadrados del laberinto
+(setq lHeight 25) ; altura en cuadrados del laberinto
 
 (putprop 'colors '(0 0 0) 'paret)
 
@@ -46,23 +46,12 @@
               '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
               '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)))
 
-
-;(defun quadrat (x)
-;    (drawrel x 0)
-;    (drawrel 0 x);
-;    (drawrel (- x) 0)
-;    (drawrel 0 (- x))
-;    (cond
-;        ((/= x 0) (quadrat (- x 1)))
-;    )
-;)
-
 (defun quadrat (x m)
-    (drawrel 0 m)
-    (moverel 1 (- m))
+    (drawrel 0 (+ m 1))
+    (moverel 1 (- (+ m 1)))
     (cond
         ((> x 0) (quadrat (- x 1) m))
-        (t (moverel (- m) 0))
+        (t (moverel (- (+ m 1)) 0))
     )
 )
 
@@ -72,13 +61,13 @@
         (t
             (apply 'color (get 'colors (car l)))    ; TOO FEW ARGUMENTS: Falla cuando hago (apply 'color (get 'colors (car l)))
             (moverel m 0)
-            (quadrat (- m 1) m)
+            (quadrat m m)
             ; pintar (o no) al jugador
             (cond
                 ((and (= px 0) (= py 0)) 
                     (apply 'color (get 'colors 'verde))
                     (moverel 2 2)
-                    (quadrat (- m 5) (- m 4))
+                    (quadrat (- m 5) (- m 5))
                     (moverel -2 -2)
                 )
             )
