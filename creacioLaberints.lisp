@@ -10,31 +10,77 @@
     ; let de nombre f al fichero
     ; (escribir f (crea-matriu ...))
     
-    (crea-cami (crea-matriu lWidth lHeight) actualX actualY)
+    (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '()))
 )
 
 ; algoritmo DFS
-(defun crea-cami (l x y)
-    ; moverme en posición random y modificar x e y según donde vaya avanzando
-    (let z (random 4))
+(defun crea-cami (l x y r)
     (cond
-        ((and (= z 0) (= (contador-camins-veins l (+ x 1) y) 1)) (crea-cami l (+ x 1) y)) ; and es pared and no se junta con camino (excepto el actual)
-        ((and (= z 1) (= (contador-camins-veins l (- x 1) y) 1)) (crea-cami l (- x 1) y))
-        ((and (= z 2) (= (contador-camins-veins l x (+ y 1)) 1)) (crea-cami l x (+ y 1)))
-        ((and (= z 3) (= (contador-camins-veins l x (- y 1)) 1)) (crea-cami l x (+ y 1)))
-        ; cómo hago para que si falla uno, pruebe otros antes del caso final?
-        (t )
+        ((null (car r)) l)
+        ((and (= (car r) 0) (= (contador-camins-veins l (+ x 1) y) 1)) 
+            (actualitza-posicio l (+ x 1) y 'cami)
+            (crea-cami l (+ x 1) y r) 
+        )
+        ((and (= (car r) 1) (= (contador-camins-veins l (- x 1) y) 1)) 
+            (actualitza-posicio l (- x 1) y 'cami)
+            (crea-cami l (- x 1) y r)
+        )
+        ((and (= (car r) 2) (= (contador-camins-veins l x (+ y 1)) 1)) (crea-cami l x (+ y 1) r)
+            (actualitza-posicio l (+ x 1) y 'cami)
+            (crea-cami l x (+ y 1) r)
+        )
+        ((and (= (car r) 3) (= (contador-camins-veins l x (- y 1)) 1)) (crea-cami l x (+ y 1) r)
+            (actualitza-posicio l (+ x 1) y 'cami)
+            (crea-cami l x (- y 1) r)
+        )
+        (t (crea-cami l x y (cdr r)))
+    )
+)
+
+(defun actualitza-posicio (l x y nou-valor)
+    (cond
+        ((= y 0) (cons (actualitza-posicio-fila (car l) x nou-valor) (cdr l)))
+        (t (cons (car l) (actualitza-posicio (cdr l) x (- y 1) nou-valor)))
+    )
+)
+
+(defun actualitza-posicio-fila (fila x nou-valor)
+    (cond
+        ((= x 0) (cons nou-valor (cdr fila)))
+        (t (cons (car fila) (actualitza-posicio-fila (cdr fila) (- x 1) nou-valor)))
+    )
+)
+
+(defun crea-llista-random (l)
+    (cond
+        ((and (pertany 0 l) (pertany 1 l) (pertany 2 l) (pertany 3 l)) (fer-conjunt l))
+        (t (crea-llista-random (cons (random 4) l)))
+    )
+)
+
+(defun pertany (x l)
+    (cond 
+        ((null l) nil)
+        ((equal x (car l)) t)
+        (t (pertany x (cdr l)))
+    )
+)
+
+(defun fer-conjunt (l)
+    (cond 
+        ((null l) nil)
+        ((pertany (car l) (cdr l)) (fer-conjunt (cdr l)))
+        (t (cons (car l) (fer-conjunt(cdr l))))
     )
 )
 
 (defun contador-camins-veins (l x y)
-    (let c 0)
-    (cond ((not (eq (obtenir-posicio l (+ x 1) y) 'paret)) (+ c 1)))  ; eq, = o equal¿?
-    (cond ((not (eq (obtenir-posicio l (- x 1) y) 'paret)) (+ c 1)))
-    (cond ((not (eq (obtenir-posicio l x (+ y 1)) 'paret)) (+ c 1)))
-    (cond ((not (eq (obtenir-posicio l x (- y 1)) 'paret)) (+ c 1)))
-    ; cómo hago que devuelva c?
+    (+  (cond ((not (equal (obtenir-posicio l (+ x 1) y) 'paret)) 1) (t 0))
+        (cond ((not (equal (obtenir-posicio l (- x 1) y) 'paret)) 1) (t 0))
+        (cond ((not (equal (obtenir-posicio l x (+ y 1)) 'paret)) 1) (t 0))
+        (cond ((not (equal (obtenir-posicio l x (- y 1)) 'paret)) 1) (t 0)))
 )
+
 
 (defun obtenir-posicio (l x y)
     (cond
