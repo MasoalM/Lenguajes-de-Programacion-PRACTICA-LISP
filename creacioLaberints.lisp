@@ -5,6 +5,12 @@
 (setq actualX entradaX)
 (setq actualY entradaY)
 
+(setq mi 14)  ; tamaño de un cuadrado ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(putprop 'colors '(0 0 0) 'paret) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(putprop 'colors '(255 255 255) 'cami) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun genera ()
     ; abrir fichero en modo escribir
     ; let de nombre f al fichero
@@ -14,32 +20,30 @@
 )
 
 ; algoritmo DFS
-(defun crea-cami (l x y r)
-    (print r)
+(defun crea-cami (m x y r)
+    ;(print m)
     (cond
-        ((null (car r)) l)
-        ((and (= (car r) 0) (= (contador-camins-veins l (+ x 1) y) 1) (equal (car (car l)) 'paret)) 
-            (actualitza-posicio l (+ x 1) y 'cami)
-            (crea-cami l (+ x 1) y (crea-llista-random '())) 
+        ((null (car r)) m)
+        ((and (= (car r) 0) (= (contador-camins-veins m (+ x 1) y) 1) (equal (obtenir-posicio m x y) 'paret)) 
+            (crea-cami (actualitza-posicio m (+ x 1) y 'cami) (+ x 1) y (crea-llista-random '())) 
         )
-        ((and (= (car r) 1) (= (contador-camins-veins l (- x 1) y) 1) (equal (car (car l)) 'paret))
-            (actualitza-posicio l (- x 1) y 'cami)
-            (crea-cami l (- x 1) y (crea-llista-random '()))
+        ((and (= (car r) 1) (= (contador-camins-veins m (- x 1) y) 1) (equal (obtenir-posicio m x y) 'paret))
+            (crea-cami (actualitza-posicio m (- x 1) y 'cami) (- x 1) y (crea-llista-random '()))
         )
-        ((and (= (car r) 2) (= (contador-camins-veins l x (+ y 1)) 1) (equal (car (car l)) 'paret))
-            (actualitza-posicio l (+ x 1) y 'cami)
-            (crea-cami l x (+ y 1) (crea-llista-random '()))
+        ((and (= (car r) 2) (= (contador-camins-veins m x (+ y 1)) 1) (equal (obtenir-posicio m x y) 'paret))
+            (crea-cami (actualitza-posicio m x (+ y 1) 'cami) x (+ y 1) (crea-llista-random '()))
         )
-        ((and (= (car r) 3) (= (contador-camins-veins l x (- y 1)) 1) (equal (car (car l)) 'paret))
-            (actualitza-posicio l (+ x 1) y 'cami)
-            (crea-cami l x (- y 1) (crea-llista-random '()))
+        ((and (= (car r) 3) (= (contador-camins-veins m x (- y 1)) 1) (equal (obtenir-posicio m x y) 'paret))
+            (crea-cami (actualitza-posicio m x (- y 1) 'cami) x (- y 1) (crea-llista-random '()))
         )
-        (t (crea-cami l x y (cdr r)))
+        ;((>= (contador-camins-veins m x y) 2) m) ; demasiadas conexiones
+        (t (crea-cami m x y (cdr r)))
     )
 )
 
 (defun actualitza-posicio (l x y nou-valor)
     (cond
+        ((null l) nil)
         ((= y 0) (cons (actualitza-posicio-fila (car l) x nou-valor) (cdr l)))
         (t (cons (car l) (actualitza-posicio (cdr l) x (- y 1) nou-valor)))
     )
@@ -47,6 +51,7 @@
 
 (defun actualitza-posicio-fila (fila x nou-valor)
     (cond
+        ((null fila) nil)
         ((= x 0) (cons nou-valor (cdr fila)))
         (t (cons (car fila) (actualitza-posicio-fila (cdr fila) (- x 1) nou-valor)))
     )
