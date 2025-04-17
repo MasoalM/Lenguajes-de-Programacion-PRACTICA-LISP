@@ -12,11 +12,8 @@
 (putprop 'colors '(255 255 255) 'cami) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun genera ()
-    ; abrir fichero en modo escribir
-    ; let de nombre f al fichero
-    ; (escribir f (crea-matriu ...))
-    
-    (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '()))
+    ; (escriuLaberint 'nom (genera-contingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())) lWidth lHeigh))
+    (generaContingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())) lWidth lHeight)
 )
 
 ; algoritmo DFS
@@ -102,6 +99,7 @@
     )
 )
 
+
 (defun crea-matriu (x y)
     (cond
         ((= 0 x) '())
@@ -117,4 +115,57 @@
     )  
 )
 
+(defun generaContingut (m x y)
+    (cond
+        ((= x 0) '())
+        (t (append (generaContingut (cdr m) (- x 1) y) (list (generaContingutFila (car m) x y))))
+    )
+)
+
+; HACER CONS DENTRO DE GENERACONTINGUTFILA SI FALLA DESPS DE HABER CAMBIADO OBTENIR POSICIO
+;(defun generaContingutFila (f x y)
+;    (cond
+;        ((= y 0) (cons '#\newline (cdr f)))
+;        ((equal (obtenir-posicio f x y) 'paret) (cons '#\# (generaContingutFila (cdr f) x (- y 1))))
+;        ((equal (obtenir-posicio f x y) 'cami) (cons '#\. (generaContingutFila (cdr f) x (- y 1))))
+;        ((equal (obtenir-posicio f x y) 'entrada) (cons '#\e (generaContingutFila (cdr f) x (- y 1))))
+;        ((equal (obtenir-posicio f x y) 'sortida) (cons '#\s (generaContingutFila (cdr f) x (- y 1))))
+;        (t (generaContingutFila (cdr f) x (- y 1))) ; por si acaso
+;    )
+;)
+
+(defun generaContingutFila (f x y)
+    (if (= y 0)
+        (list '#\newline)
+        (let ((valor (obtenir-posicio f x y)))
+            (cons
+                (cond
+                    ((equal valor 'paret)    #\#)
+                    ((equal valor 'cami)     #\.)
+                    ((equal valor 'entrada)  #\e)
+                    ((equal valor 'sortida)  #\s)
+                    (t #\?)) ; caracter desconocido
+                (generaContingutFila (cdr f) x (- y 1)))))
+)
+
+
+(defun escriuLaberint (nom contingut)  
+    (let ((fp (open nom :direction :output)))
+        (escriu-intern fp contingut)
+        (close fp)
+    )
+)
+
+;(escriu "text2.txt" '(#\h #\o #\l #\a #\Space #\c
+;#\o #\m #\Space #\Newline #\Space #\Space #\v #\a
+;#\Space #\a #\i #\x #\o #\. #\Newline))
+
+(defun escriu-intern (fp contingut)
+    (cond ((null contingut) nil)
+        (t (write-char (car contingut) fp) (escriu-intern fp (cdr contingut)))
+    )
+)
+(escriuLaberint "text2.txt" '(#\h #\o #\l #\a #\Space #\c
+#\o #\m #\Space #\Newline #\Space #\Space #\v #\a
+#\Space #\a #\i #\x #\o #\. #\Newline))
 (print (genera))
