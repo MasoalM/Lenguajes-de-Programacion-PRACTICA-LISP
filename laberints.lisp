@@ -5,8 +5,8 @@
 (setq xi 20) ; posicion x donde empieza a pintar
 (setq yi 0) ; posicion y donde empieza a pintar 
 (setq m 14)  ; tamaño de un cuadrado
-(setq px 10) ; posicion inicial x en la matriz del jugador   
-(setq py 10) ; posicion inicial y en la matriz del jugador
+(setq px 5) ; posicion inicial x en la matriz del jugador   
+(setq py 5) ; posicion inicial y en la matriz del jugador
 (setq lWidth 25) ; anchura en cuadrados del laberinto
 (setq lHeight 25) ; altura en cuadrados del laberinto
 
@@ -14,37 +14,13 @@
 
 (putprop 'colors '(255 255 255) 'cami)
 
-(putprop 'colors '(255 0 0) 'rojo)
+(putprop 'colors '(255 0 0) 'sortida)
 
-(putprop 'colors '(0 255 0) 'verde)
+(putprop 'colors '(0 255 0) 'jugador)
 
-(putprop 'colors '(0 0 255) 'azul)
+(putprop 'colors '(0 0 255) 'entrada)
 
-
-(setq l (list '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret cami cami paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret cami cami cami paret paret paret cami paret paret paret paret paret paret paret paret paret paret paret)  ; HACERLO ÓPTIMO
-              '(paret paret paret paret paret paret paret cami paret cami cami paret paret cami paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret cami paret paret cami cami cami cami paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret cami cami paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret cami cami paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret cami cami paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret cami paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret cami cami cami cami paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret cami paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)
-              '(paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret paret)))
+(setq l (llegeixMatriu (llegeixLaberint "laberints_exemple/25x25_1.txt")))
 
 (defun quadrat (x m)
     (drawrel 0 (+ m 1))
@@ -65,7 +41,7 @@
             ; pintar (o no) al jugador
             (cond
                 ((and (= px 0) (= py 0)) 
-                    (apply 'color (get 'colors 'verde))
+                    (apply 'color (get 'colors 'jugador))
                     (moverel 2 3)
                     (quadrat (- m 5) (- m 5))
                     (moverel -2 -3)
@@ -145,7 +121,7 @@
     )
 )
 
-(defun llegeixLaberint (nom) ;lee el laberinto 
+(defun llegeixLaberint (nom) ; lee el laberinto 
     (let* ((fp (open nom)) (contingut (llegeix-intern fp))) (close fp) contingut)
 )
 
@@ -157,5 +133,42 @@
     )
 )
 
+(defun llegeixMatriu (l)
+    (cond
+        ((null l) '())
+        (t (cons (llegeixMatriuFila l) (llegeixMatriu (salta-fila l))))
+    )
+)
+
+(defun llegeixMatriuFila (f)
+    (cond
+        ((null f) '())
+        ((equal (car f) #\Newline) '())
+        ((equal (car f) #\#) (cons 'paret (llegeixMatriuFila (cdr f))))
+        ((equal (car f) #\.) (cons 'cami (llegeixMatriuFila (cdr f))))
+        ((equal (car f) #\e) 
+            ; almacenar posición inicial jugador y asignar valor a las variables px y py
+            (cons 'entrada (llegeixMatriuFila (cdr f)))
+        )
+        ((equal (car f) #\s) (cons 'sortida (llegeixMatriuFila (cdr f))))
+        (t (cons '? (llegeixMatriuFila (cdr f))))
+    )
+)
+
+(defun salta-fila (l)
+    (cond
+        ((null l) '())
+        ((equal (car l) #\Newline) (cdr l))
+        (t (salta-fila (cdr l)))
+    )
+)
+
+(defun crea-fila (x y)
+    (cond
+        ((= 0 y) '())
+        ((and (= entradaX x) (= entradaY y)) (cons 'entrada (crea-fila x (- y 1))))
+        (t (cons 'paret (crea-fila x (- y 1))))
+    )  
+)
 
 (passa l px (- lHeight (+ py 1)))
