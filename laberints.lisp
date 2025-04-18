@@ -20,8 +20,6 @@
 
 (putprop 'colors '(0 0 255) 'entrada)
 
-(setq l (llegeixMatriu (llegeixLaberint "laberints_exemple/25x25_1.txt")))
-
 (defun quadrat (x m)
     (drawrel 0 (+ m 1))
     (moverel 1 (- (+ m 1)))
@@ -170,5 +168,7 @@
         (t (cons 'paret (crea-fila x (- y 1))))
     )  
 )
+
+(setq l (llegeixMatriu (llegeixLaberint "laberints_exemple/25x25_1.txt")))
 
 (passa l px (- lHeight (+ py 1)))
