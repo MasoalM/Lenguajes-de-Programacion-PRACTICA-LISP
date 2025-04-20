@@ -13,30 +13,29 @@
 
 (defun genera ()
     ; (escriuLaberint 'nom (genera-contingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())) lWidth lHeigh))
-    (generaContingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())) lWidth lHeight)
+    (generaContingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())))
 )
 
 ; algoritmo DFS
 (defun crea-cami (m x y r)
-    ;(print m)
     (cond
-        ((null (car r)) m)
-        ((and (= (car r) 0) (= (contador-camins-veins m (+ x 1) y) 1) (equal (obtenir-posicio m x y) 'paret)) 
-            (crea-cami (actualitza-posicio m (+ x 1) y 'cami) (+ x 1) y (crea-llista-random '())) 
-        )
-        ((and (= (car r) 1) (= (contador-camins-veins m (- x 1) y) 1) (equal (obtenir-posicio m x y) 'paret))
-            (crea-cami (actualitza-posicio m (- x 1) y 'cami) (- x 1) y (crea-llista-random '()))
-        )
-        ((and (= (car r) 2) (= (contador-camins-veins m x (+ y 1)) 1) (equal (obtenir-posicio m x y) 'paret))
-            (crea-cami (actualitza-posicio m x (+ y 1) 'cami) x (+ y 1) (crea-llista-random '()))
-        )
-        ((and (= (car r) 3) (= (contador-camins-veins m x (- y 1)) 1) (equal (obtenir-posicio m x y) 'paret))
-            (crea-cami (actualitza-posicio m x (- y 1) 'cami) x (- y 1) (crea-llista-random '()))
-        )
-        ;((>= (contador-camins-veins m x y) 2) m) ; demasiadas conexiones
+        ((null r) m)
+        ((and (= (car r) 0) (limites m (+ x 1) y) (= (contador-camins-veins m (+ x 1) y) 1) (equal (obtenir-posicio m (+ x 1) y) 'paret))
+            (let ((nuevo-mapa (actualitza-posicio m (+ x 1) y 'cami))) (crea-cami nuevo-mapa (+ x 1) y (crea-llista-random '()))))
+        ((and (= (car r) 1) (limites m (- x 1) y) (= (contador-camins-veins m (- x 1) y) 1) (equal (obtenir-posicio m (- x 1) y) 'paret))
+            (let ((nuevo-mapa (actualitza-posicio m (- x 1) y 'cami))) (crea-cami nuevo-mapa (- x 1) y (crea-llista-random '()))))
+        ((and (= (car r) 2) (limites m x (+ y 1)) (= (contador-camins-veins m x (+ y 1)) 1) (equal (obtenir-posicio m x (+ y 1)) 'paret))
+            (let ((nuevo-mapa (actualitza-posicio m x (+ y 1) 'cami))) (crea-cami nuevo-mapa x (+ y 1) (crea-llista-random '()))))
+        ((and (= (car r) 3) (limites m x (- y 1)) (= (contador-camins-veins m x (- y 1)) 1) (equal (obtenir-posicio m x (- y 1)) 'paret))
+            (let ((nuevo-mapa (actualitza-posicio m x (- y 1) 'cami))) (crea-cami nuevo-mapa x (- y 1) (crea-llista-random '()))))
         (t (crea-cami m x y (cdr r)))
     )
 )
+
+(defun limites (m x y)
+    (and (>= x 0) (>= y 0) (< x lWidth) (< y lHeight))
+)
+
 
 (defun actualitza-posicio (l x y nou-valor)
     (cond
@@ -87,14 +86,14 @@
 
 (defun obtenir-posicio (l x y)
     (cond
-        ((= y 0) (obtenir-posicio-exacta (car l) x))
+        ((<= y 0) (obtenir-posicio-exacta (car l) x))
         (t (obtenir-posicio (cdr l) x (- y 1)))
     )
 )
 
 (defun obtenir-posicio-exacta (l x)
     (cond
-        ((= x 0) (car l))
+        ((<= x 0) (car l))
         (t (obtenir-posicio-exacta (cdr l) (- x 1)))
     )
 )
@@ -115,38 +114,25 @@
     )  
 )
 
-(defun generaContingut (m x y)
-    (cond
-        ((= x 0) '())
-        (t (append (generaContingut (cdr m) (- x 1) y) (list (generaContingutFila (car m) x y))))
-    )
+(defun generaContingut (m)
+  (cond
+    ((null m) '())
+    (t (append (generaContingutFila (car m)) (generaContingut (cdr m))))
+  )
 )
 
-; HACER CONS DENTRO DE GENERACONTINGUTFILA SI FALLA DESPS DE HABER CAMBIADO OBTENIR POSICIO
-;(defun generaContingutFila (f x y)
-;    (cond
-;        ((= y 0) (cons '#\newline (cdr f)))
-;        ((equal (obtenir-posicio f x y) 'paret) (cons '#\# (generaContingutFila (cdr f) x (- y 1))))
-;        ((equal (obtenir-posicio f x y) 'cami) (cons '#\. (generaContingutFila (cdr f) x (- y 1))))
-;        ((equal (obtenir-posicio f x y) 'entrada) (cons '#\e (generaContingutFila (cdr f) x (- y 1))))
-;        ((equal (obtenir-posicio f x y) 'sortida) (cons '#\s (generaContingutFila (cdr f) x (- y 1))))
-;        (t (generaContingutFila (cdr f) x (- y 1))) ; por si acaso
-;    )
-;)
-
-(defun generaContingutFila (f x y)
-    (if (= y 0)
-        (list '#\newline)
-        (let ((valor (obtenir-posicio f x y)))
-            (cons
-                (cond
-                    ((equal valor 'paret)    #\#)
-                    ((equal valor 'cami)     #\.)
-                    ((equal valor 'entrada)  #\e)
-                    ((equal valor 'sortida)  #\s)
-                    (t #\?)) ; caracter desconocido
-                (generaContingutFila (cdr f) x (- y 1)))))
+(defun generaContingutFila (fila)
+  (cond
+    ((null fila) (list #\Newline))
+    ((equal (car fila) 'paret)    (cons #\# (generaContingutFila (cdr fila))))
+    ((equal (car fila) 'cami)     (cons #\. (generaContingutFila (cdr fila))))
+    ((equal (car fila) 'entrada)  (cons #\e (generaContingutFila (cdr fila))))
+    ((equal (car fila) 'sortida)  (cons #\s (generaContingutFila (cdr fila))))
+    (t                            (cons #\? (generaContingutFila (cdr fila))))
+  )
 )
+
+
 
 
 (defun escriuLaberint (nom contingut)  
