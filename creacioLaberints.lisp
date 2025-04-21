@@ -13,7 +13,7 @@
 
 (defun genera ()
     ; (escriuLaberint 'nom (genera-contingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())) lWidth lHeigh))
-    (generaContingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())))
+    (escriuLaberint "prueba.txt" (generaContingut (crea-sortida (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())))))
 )
 
 ; algoritmo DFS
@@ -21,21 +21,26 @@
     (cond
         ((null r) m)
         ((and (= (car r) 0) (limites m (+ x 1) y) (= (contador-camins-veins m (+ x 1) y) 1) (equal (obtenir-posicio m (+ x 1) y) 'paret))
-            (let ((nuevo-mapa (actualitza-posicio m (+ x 1) y 'cami))) (crea-cami nuevo-mapa (+ x 1) y (crea-llista-random '()))))
+            (crea-cami (actualitza-posicio m (+ x 1) y 'cami) (+ x 1) y (crea-llista-random '())))
         ((and (= (car r) 1) (limites m (- x 1) y) (= (contador-camins-veins m (- x 1) y) 1) (equal (obtenir-posicio m (- x 1) y) 'paret))
-            (let ((nuevo-mapa (actualitza-posicio m (- x 1) y 'cami))) (crea-cami nuevo-mapa (- x 1) y (crea-llista-random '()))))
+            (crea-cami (actualitza-posicio m (- x 1) y 'cami) (- x 1) y (crea-llista-random '())))
         ((and (= (car r) 2) (limites m x (+ y 1)) (= (contador-camins-veins m x (+ y 1)) 1) (equal (obtenir-posicio m x (+ y 1)) 'paret))
-            (let ((nuevo-mapa (actualitza-posicio m x (+ y 1) 'cami))) (crea-cami nuevo-mapa x (+ y 1) (crea-llista-random '()))))
+            (crea-cami (actualitza-posicio m x (+ y 1) 'cami) x (+ y 1) (crea-llista-random '())))
         ((and (= (car r) 3) (limites m x (- y 1)) (= (contador-camins-veins m x (- y 1)) 1) (equal (obtenir-posicio m x (- y 1)) 'paret))
-            (let ((nuevo-mapa (actualitza-posicio m x (- y 1) 'cami))) (crea-cami nuevo-mapa x (- y 1) (crea-llista-random '()))))
+            (crea-cami (actualitza-posicio m x (- y 1) 'cami) x (- y 1) (crea-llista-random '())))
         (t (crea-cami m x y (cdr r)))
     )
 )
 
+(defun crea-sortida (m)
+
+)
+
+; -----------------------------? (and (>= x 1) (>= y 1) (< x (- lWidth 1)) (< y (- lHeight 1)))
 (defun limites (m x y)
     (and (>= x 0) (>= y 0) (< x lWidth) (< y lHeight))
 )
-
+; -----------------------------?
 
 (defun actualitza-posicio (l x y nou-valor)
     (cond
@@ -151,7 +156,5 @@
         (t (write-char (car contingut) fp) (escriu-intern fp (cdr contingut)))
     )
 )
-(escriuLaberint "text2.txt" '(#\h #\o #\l #\a #\Space #\c
-#\o #\m #\Space #\Newline #\Space #\Space #\v #\a
-#\Space #\a #\i #\x #\o #\. #\Newline))
+
 (print (genera))

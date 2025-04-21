@@ -1,14 +1,17 @@
 ; Título: Juego Laberinto LISP
-; Autores : Marcos Socías Alberto y Hugo Valls Sabater
-; Fecha última modificación: 04/04/2025
+; Autores: Marcos Socías Alberto y Hugo Valls Sabater
+; Fecha última modificación: 21/04/2025
+; Asignatura: Lenguajes de Programación
+; Grupo: 102
+; Profesor teoría: Antoni Oliver Tomàs
+; Profesor prácticas: Francesc Xavier Gaya Morey
+; Convocatoria: Ordinaria
 
 (setq xi 20) ; posicion x donde empieza a pintar
 (setq yi 0) ; posicion y donde empieza a pintar 
 (setq m 14)  ; tamaño de un cuadrado
-(setq px 5) ; posicion inicial x en la matriz del jugador   
-(setq py 5) ; posicion inicial y en la matriz del jugador
-(setq lWidth 25) ; anchura en cuadrados del laberinto
-(setq lHeight 25) ; altura en cuadrados del laberinto
+(setq lWidth 10) ; anchura en cuadrados del laberinto
+(setq lHeight 10) ; altura en cuadrados del laberinto
 
 (putprop 'colors '(0 0 0) 'paret)
 
@@ -98,25 +101,38 @@
     )
 )
 
-(defun passa (l px py)
+(defun passa (l px py n)
     (cls)
     (move xi (+ yi (* m lHeight)))
     (pinta l px py)
-    (setq tecla (get-key))
     (cond
-        ; si la tecla pulsada es A o flecha izquierda
-        ((and (or (= 65 tecla) (= 97 tecla) (= 331 tecla)) (not (equal (obtenir-posicio l (esquerra px) py) 'paret))) (passa l (esquerra px) py))
-        ; si la tecla pulsada es D o flecha derecha
-        ((and (or (= 68 tecla) (= 100 tecla) (= 333 tecla)) (not (equal (obtenir-posicio l (dreta px) py) 'paret))) (passa l (dreta px) py))
-        ; si la tecla pulsada es W o flecha arriba (irá abajo porque se pinta al revés)
-        ((and (or (= 87 tecla) (= 119 tecla) (= 328 tecla)) (not (equal (obtenir-posicio l px (abaix py)) 'paret))) (passa l px (abaix py)))
-        ; si la tecla pulsada es S o flecha abajo (irá arriba porque se pinta al revés)
-        ((and (or (= 83 tecla) (= 115 tecla) (= 336 tecla)) (not (equal (obtenir-posicio l px (amunt py)) 'paret))) (passa l px (amunt py)))
-        ; si la tecla pulsada es ESC
-        ((= 27 tecla) l)
-        ; si no, se llama recursivamente tal cual
-        (t (passa l px py))
+        ((equal (obtenir-posicio l px py) 'sortida) (cls) (print "HAS GANADO") (print nomJugador) (print "EN TAN SOLO") (print n) (print "PASOS") l)
+        (t 
+            (setq tecla (get-key))
+            (cond
+                ; si la tecla pulsada es A o flecha izquierda
+                ((and (or (= 65 tecla) (= 97 tecla) (= 331 tecla)) (not (equal (obtenir-posicio l (esquerra px) py) 'paret))) (passa l (esquerra px) py (+ n 1)))
+                ; si la tecla pulsada es D o flecha derecha
+                ((and (or (= 68 tecla) (= 100 tecla) (= 333 tecla)) (not (equal (obtenir-posicio l (dreta px) py) 'paret))) (passa l (dreta px) py (+ n 1)))
+                ; si la tecla pulsada es W o flecha arriba (irá abajo porque se pinta al revés)
+                ((and (or (= 87 tecla) (= 119 tecla) (= 328 tecla)) (not (equal (obtenir-posicio l px (abaix py)) 'paret))) (passa l px (abaix py) (+ n 1)))
+                ; si la tecla pulsada es S o flecha abajo (irá arriba porque se pinta al revés)
+                ((and (or (= 83 tecla) (= 115 tecla) (= 336 tecla)) (not (equal (obtenir-posicio l px (amunt py)) 'paret))) (passa l px (amunt py) (+ n 1)))
+                ; si la tecla pulsada es ESC
+                ((= 27 tecla) l)
+                ; si no, se llama recursivamente tal cual
+                (t (passa l px py n))
+            )
+        )
     )
+    
+)
+
+(defun explora (nom)
+    ; Pedir nombre al usuario
+    (print "Escribe tu nombre, jugador")
+    (setq nomJugador (read))
+    (passa (llegeixMatriu (llegeixLaberint nom) 0 0) px py 0) 
 )
 
 (defun llegeixLaberint (nom) ; lee el laberinto 
@@ -131,25 +147,27 @@
     )
 )
 
-(defun llegeixMatriu (l)
+(defun llegeixMatriu (l x y)
     (cond
         ((null l) '())
-        (t (cons (llegeixMatriuFila l) (llegeixMatriu (salta-fila l))))
+        (t (cons (llegeixMatriuFila l x y) (llegeixMatriu (salta-fila l) x (+ y 1))))
     )
 )
 
-(defun llegeixMatriuFila (f)
+(defun llegeixMatriuFila (f x y)
     (cond
         ((null f) '())
         ((equal (car f) #\Newline) '())
-        ((equal (car f) #\#) (cons 'paret (llegeixMatriuFila (cdr f))))
-        ((equal (car f) #\.) (cons 'cami (llegeixMatriuFila (cdr f))))
+        ((equal (car f) #\#) (cons 'paret (llegeixMatriuFila (cdr f) (+ x 1) y)))
+        ((equal (car f) #\.) (cons 'cami (llegeixMatriuFila (cdr f) (+ x 1) y)))
         ((equal (car f) #\e) 
             ; almacenar posición inicial jugador y asignar valor a las variables px y py
-            (cons 'entrada (llegeixMatriuFila (cdr f)))
+            (setq px x) ; posicion inicial x en la matriz del jugador   
+            (setq py y) ; posicion inicial y en la matriz del jugador
+            (cons 'entrada (llegeixMatriuFila (cdr f) (+ x 1) y))
         )
-        ((equal (car f) #\s) (cons 'sortida (llegeixMatriuFila (cdr f))))
-        (t (cons '? (llegeixMatriuFila (cdr f))))
+        ((equal (car f) #\s) (cons 'sortida (llegeixMatriuFila (cdr f) (+ x 1) y)))
+        (t (cons '? (llegeixMatriuFila (cdr f) (+ x 1) y)))
     )
 )
 
@@ -169,6 +187,8 @@
     )  
 )
 
-(setq l (llegeixMatriu (llegeixLaberint "laberints_exemple/25x25_1.txt")))
+(defun creaFitxer (nomLaberint)
 
-(passa l px (- lHeight (+ py 1)))
+)
+
+(explora "laberints_exemple/10x10_massapetit_1.txt")
