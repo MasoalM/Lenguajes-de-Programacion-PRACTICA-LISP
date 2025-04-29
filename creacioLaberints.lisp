@@ -1,7 +1,8 @@
 (setq lWidth 10)
 (setq lHeight 10)
-(setq entradaX (+ (random lWidth) 1))
-(setq entradaY (+ (random lHeight) 1))
+(setq rs (make-random-state t))
+(setq entradaX (+ (random lWidth rs) 1))
+(setq entradaY (+ (random lHeight rs) 1))
 (setq actualX entradaX)
 (setq actualY entradaY)
 
@@ -13,21 +14,23 @@
 
 (defun genera ()
     ; (escriuLaberint 'nom (genera-contingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())) lWidth lHeigh))
-    (escriuLaberint "prueba.txt" (generaContingut (crea-sortida (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '())))))
+    (escriuLaberint "prueba.txt" (generaContingut (crea-cami (crea-matriu lWidth lHeight) actualX actualY (crea-llista-random '()))))
 )
 
 ; algoritmo DFS
 (defun crea-cami (m x y r)
+; (get-key)
+; (pinta)
     (cond
         ((null r) m)
-        ((and (= (car r) 0) (limites m (+ x 1) y) (= (contador-camins-veins m (+ x 1) y) 1) (equal (obtenir-posicio m (+ x 1) y) 'paret))
-            (crea-cami (actualitza-posicio m (+ x 1) y 'cami) (+ x 1) y (crea-llista-random '())))
-        ((and (= (car r) 1) (limites m (- x 1) y) (= (contador-camins-veins m (- x 1) y) 1) (equal (obtenir-posicio m (- x 1) y) 'paret))
-            (crea-cami (actualitza-posicio m (- x 1) y 'cami) (- x 1) y (crea-llista-random '())))
-        ((and (= (car r) 2) (limites m x (+ y 1)) (= (contador-camins-veins m x (+ y 1)) 1) (equal (obtenir-posicio m x (+ y 1)) 'paret))
-            (crea-cami (actualitza-posicio m x (+ y 1) 'cami) x (+ y 1) (crea-llista-random '())))
-        ((and (= (car r) 3) (limites m x (- y 1)) (= (contador-camins-veins m x (- y 1)) 1) (equal (obtenir-posicio m x (- y 1)) 'paret))
-            (crea-cami (actualitza-posicio m x (- y 1) 'cami) x (- y 1) (crea-llista-random '())))
+        ((and (= (car r) 0) (= (contador-camins-veins m (+ x 1) y) 1) (equal (obtenir-posicio m (+ x 1) y) 'paret))
+            (crea-cami (crea-cami (actualitza-posicio m (+ x 1) y 'cami) (+ x 1) y (crea-llista-random '())) x y (cdr r)))
+        ((and (= (car r) 1) (= (contador-camins-veins m (- x 1) y) 1) (equal (obtenir-posicio m (- x 1) y) 'paret))
+            (crea-cami (crea-cami (actualitza-posicio m (- x 1) y 'cami) (- x 1) y (crea-llista-random '())) x y (cdr r)))
+        ((and (= (car r) 2) (= (contador-camins-veins m x (+ y 1)) 1) (equal (obtenir-posicio m x (+ y 1)) 'paret))
+            (crea-cami (crea-cami (actualitza-posicio m x (+ y 1) 'cami) x (+ y 1) (crea-llista-random '())) x y (cdr r)))
+        ((and (= (car r) 3) (= (contador-camins-veins m x (- y 1)) 1) (equal (obtenir-posicio m x (- y 1)) 'paret))
+            (crea-cami (crea-cami (actualitza-posicio m x (- y 1) 'cami) x (- y 1) (crea-llista-random '())) x y (cdr r)))
         (t (crea-cami m x y (cdr r)))
     )
 )
@@ -61,7 +64,7 @@
 (defun crea-llista-random (l)
     (cond
         ((and (pertany 0 l) (pertany 1 l) (pertany 2 l) (pertany 3 l)) (fer-conjunt l))
-        (t (crea-llista-random (cons (random 4) l)))
+        (t (crea-llista-random (cons (random 4 rs) l)))
     )
 )
 

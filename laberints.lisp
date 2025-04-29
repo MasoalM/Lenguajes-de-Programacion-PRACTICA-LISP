@@ -10,8 +10,8 @@
 (setq xi 20) ; posicion x donde empieza a pintar
 (setq yi 0) ; posicion y donde empieza a pintar 
 (setq m 14)  ; tamaño de un cuadrado
-(setq lWidth 10) ; anchura en cuadrados del laberinto
-(setq lHeight 10) ; altura en cuadrados del laberinto
+(setq lWidth 25) ; anchura en cuadrados del laberinto
+(setq lHeight 25) ; altura en cuadrados del laberinto
 
 (putprop 'colors '(0 0 0) 'paret)
 
@@ -191,4 +191,4 @@
 
 )
 
-(explora "laberints_exemple/10x10_massapetit_1.txt")
+(explora "laberints_exemple/25x25_1.txt")
