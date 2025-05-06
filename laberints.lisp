@@ -6,12 +6,13 @@
 ; Profesor teoría: Antoni Oliver Tomàs
 ; Profesor prácticas: Francesc Xavier Gaya Morey
 ; Convocatoria: Ordinaria
+; PONER MÁS TEXTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
 (setq xi 20) ; posicion x donde empieza a pintar
 (setq yi 0) ; posicion y donde empieza a pintar 
 (setq m 14)  ; tamaño de un cuadrado
-(setq lWidth 25) ; anchura en cuadrados del laberinto
-(setq lHeight 25) ; altura en cuadrados del laberinto
+(setq lWidth 25) 
+(setq lHeight 25)
 
 (putprop 'colors '(0 0 0) 'paret)
 
@@ -119,7 +120,7 @@
                 ; si la tecla pulsada es S o flecha abajo (irá arriba porque se pinta al revés)
                 ((and (or (= 83 tecla) (= 115 tecla) (= 336 tecla)) (not (equal (obtenir-posicio l px (amunt py)) 'paret))) (passa l px (amunt py) (+ n 1)))
                 ; si la tecla pulsada es ESC
-                ((= 27 tecla) l)
+                ((= 27 tecla) (cls) l)
                 ; si no, se llama recursivamente tal cual
                 (t (passa l px py n))
             )
@@ -191,4 +192,4 @@
 
 )
 
-(explora "laberints_exemple/25x25_1.txt")
+(explora "prueba.txt")
