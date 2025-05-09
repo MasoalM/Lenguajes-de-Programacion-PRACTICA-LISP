@@ -11,8 +11,8 @@
 (setq xi 20) ; posicion x donde empieza a pintar
 (setq yi 0) ; posicion y donde empieza a pintar 
 (setq m 14)  ; tamaño de un cuadrado
-(setq lWidth 25) 
-(setq lHeight 25)
+;(setq lWidth 25) 
+;(setq lHeight 25)
 
 (putprop 'colors '(0 0 0) 'paret)
 
@@ -133,7 +133,7 @@
     ; Pedir nombre al usuario
     (print "Escribe tu nombre, jugador")
     (setq nomJugador (read))
-    (passa (llegeixMatriu (llegeixLaberint nom) 0 0) px py 0) 
+    (passa (llegeixMatriu (llegeixLaberint nom) 0 0 0) px py 0) 
 )
 
 (defun llegeixLaberint (nom) ; lee el laberinto 
@@ -148,17 +148,17 @@
     )
 )
 
-(defun llegeixMatriu (l x y)
+(defun llegeixMatriu (l x y c)
     (cond
-        ((null l) '())
-        (t (cons (llegeixMatriuFila l x y) (llegeixMatriu (salta-fila l) x (+ y 1))))
+        ((null l) (setq lWidth c) (setq lHeight y) '())
+        (t (cons (llegeixMatriuFila l x y) (llegeixMatriu (salta-fila l) x (+ y 1) (+ c 1))))
     )
 )
 
 (defun llegeixMatriuFila (f x y)
     (cond
         ((null f) '())
-        ((equal (car f) #\Newline) '())
+        ((equal (car f) #\Newline) '()) ; SETQ SE SOBREESCRIBE Y ESTÁ MAL? ------------------------------------
         ((equal (car f) #\#) (cons 'paret (llegeixMatriuFila (cdr f) (+ x 1) y)))
         ((equal (car f) #\.) (cons 'cami (llegeixMatriuFila (cdr f) (+ x 1) y)))
         ((equal (car f) #\e) 
@@ -192,4 +192,4 @@
 
 )
 
-(explora "prueba.txt")
+(explora "pruebanueva.txt")

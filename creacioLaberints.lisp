@@ -8,16 +8,16 @@
 ; Convocatoria: Ordinaria
 ; ---------------------------------- PONER MÁS COSAS
 
-(setq lWidth 25)
-(setq lHeight 25)
 (setq rs (make-random-state t))
 (setq entradaX (+ (random (- lWidth 2) rs) 1))
 (setq entradaY (+ (random (- lHeight 2) rs) 1))
 (setq actualX entradaX)
 (setq actualY entradaY)
 
-(defun genera ()
-    (escriuLaberint "prueba.txt" (generaContingut (crea-sortida (crea-cami (crea-matriu 0 lWidth lHeight) actualX actualY (crea-llista-random '())))))
+(defun genera (nom x y)
+    (setq lWidth x)
+    (setq lHeight y)
+    (escriuLaberint nom (generaContingut (crea-sortida (crea-cami (crea-matriu 0 lWidth lHeight) actualX actualY (crea-llista-random '())))))
 )
 
 ; algoritmo DFS
@@ -89,7 +89,7 @@
         (t (cons (car l) (fer-conjunt(cdr l))))
     )
 )
-; comprueba si estamos en un camino legal ,mirando el tipo de casillas vecinas ( arriba abajo izquierda derecha)
+; comprueba si estamos en un camino legal, mirando el tipo de casillas vecinas
 ; MEJORAR PORQUE SOLO USA UN COND Y SALE
 (defun contador-camins-veins (l x y)
     (+  (cond ((not (equal (obtenir-posicio l (+ x 1) y) 'paret)) 1) (t 0))
@@ -98,8 +98,7 @@
         (cond ((not (equal (obtenir-posicio l x (- y 1)) 'paret)) 1) (t 0))
     )
 )
-; comprueba si estamos en un camino legal ,mirando el tipo de casillas vecinas ( posiciones diagonalmente inmediatas)
-;(defun contador-camins-veins-cantons (l x y)
+
 ;    (+ 
 ;        (cond ((not (equal (obtenir-posicio l (+ x 1) (+ y 1)) 'paret)) 1) (t 0))
 ;        (cond ((not (equal (obtenir-posicio l (+ x 1) (- y 1)) 'paret)) 1) (t 0))
@@ -169,4 +168,4 @@
     )
 )
 
-(print (genera))
+(print (genera "pruebanueva.txt" 10 10))
