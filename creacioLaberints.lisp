@@ -7,16 +7,17 @@
 ; Profesor prácticas: Francesc Xavier Gaya Morey
 ; Convocatoria: Ordinaria
 ; ---------------------------------- PONER MÁS COSAS
+; EXTRAS: SE EVITAN ESQUINAS
 
 (setq rs (make-random-state t))
-(setq entradaX (+ (random (- lWidth 2) rs) 1))
-(setq entradaY (+ (random (- lHeight 2) rs) 1))
-(setq actualX entradaX)
-(setq actualY entradaY)
 
 (defun genera (nom x y)
     (setq lWidth x)
     (setq lHeight y)
+    (setq entradaX (+ (random (- lWidth 2) rs) 1))
+    (setq entradaY (+ (random (- lHeight 2) rs) 1))
+    (setq actualX entradaX)
+    (setq actualY entradaY)
     (escriuLaberint nom (generaContingut (crea-sortida (crea-cami (crea-matriu 0 lWidth lHeight) actualX actualY (crea-llista-random '())))))
 )
 
@@ -24,13 +25,13 @@
 (defun crea-cami (m x y r)
     (cond
         ((null r) m)
-        ((and (= (car r) 0) (= (contador-camins-veins m (+ x 1) y) 1) (equal (obtenir-posicio m (+ x 1) y) 'paret) (limites (+ x 1) y))
+        ((and (= (car r) 0) (= (contador-camins-veins m (+ x 1) y) 1) (= (contador-esquines-veines m (+ x 1) y 0) 0) (equal (obtenir-posicio m (+ x 1) y) 'paret) (limites (+ x 1) y))
             (crea-cami (crea-cami (actualitza-posicio m (+ x 1) y 'cami) (+ x 1) y (crea-llista-random '())) x y (cdr r)))
-        ((and (= (car r) 1) (<= (contador-camins-veins m (- x 1) y) 1) (equal (obtenir-posicio m (- x 1) y) 'paret) (limites (- x 1) y))
+        ((and (= (car r) 1) (<= (contador-camins-veins m (- x 1) y) 1) (= (contador-esquines-veines m (- x 1) y 1) 0) (equal (obtenir-posicio m (- x 1) y) 'paret) (limites (- x 1) y))
             (crea-cami (crea-cami (actualitza-posicio m (- x 1) y 'cami) (- x 1) y (crea-llista-random '())) x y (cdr r)))
-        ((and (= (car r) 2) (<= (contador-camins-veins m x (+ y 1)) 1) (equal (obtenir-posicio m x (+ y 1)) 'paret) (limites x (+ y 1)))
+        ((and (= (car r) 2) (<= (contador-camins-veins m x (+ y 1)) 1) (= (contador-esquines-veines m x (+ y 1) 2) 0) (equal (obtenir-posicio m x (+ y 1)) 'paret) (limites x (+ y 1)))
             (crea-cami (crea-cami (actualitza-posicio m x (+ y 1) 'cami) x (+ y 1) (crea-llista-random '())) x y (cdr r)))
-        ((and (= (car r) 3) (<= (contador-camins-veins m x (- y 1)) 1) (equal (obtenir-posicio m x (- y 1)) 'paret) (limites x (- y 1)))
+        ((and (= (car r) 3) (<= (contador-camins-veins m x (- y 1)) 1) (= (contador-esquines-veines m x (- y 1) 3) 0) (equal (obtenir-posicio m x (- y 1)) 'paret) (limites x (- y 1)))
             (crea-cami (crea-cami (actualitza-posicio m x (- y 1) 'cami) x (- y 1) (crea-llista-random '())) x y (cdr r)))
         (t (crea-cami m x y (cdr r)))
     )
@@ -99,13 +100,31 @@
     )
 )
 
-;    (+ 
-;        (cond ((not (equal (obtenir-posicio l (+ x 1) (+ y 1)) 'paret)) 1) (t 0))
-;        (cond ((not (equal (obtenir-posicio l (+ x 1) (- y 1)) 'paret)) 1) (t 0))
-;        (cond ((not (equal (obtenir-posicio l (- x 1) (+ y 1)) 'paret)) 1) (t 0))
-;        (cond ((not (equal (obtenir-posicio l (- x 1) (- y 1)) 'paret)) 1) (t 0))
-;    )
-;)
+(defun contador-esquines-veines (l x y dir)
+    (cond
+        ; DERECHA (0)
+        ((= dir 0) (+
+            (cond ((not (equal (obtenir-posicio l (+ x 1) (+ y 1)) 'paret)) 1) (t 0))
+            (cond ((not (equal (obtenir-posicio l (+ x 1) (- y 1)) 'paret)) 1) (t 0))
+        ))
+        ; IZQUIERDA (1)
+        ((= dir 1) (+
+            (cond ((not (equal (obtenir-posicio l (- x 1) (+ y 1)) 'paret)) 1) (t 0))
+            (cond ((not (equal (obtenir-posicio l (- x 1) (- y 1)) 'paret)) 1) (t 0))
+        ))
+        ; ARRIBA (2)
+        ((= dir 2) (+  
+            (cond ((not (equal (obtenir-posicio l (+ x 1) (+ y 1)) 'paret)) 1) (t 0))
+            (cond ((not (equal (obtenir-posicio l (- x 1) (+ y 1)) 'paret)) 1) (t 0))
+        ))
+        ; ABAJO (3)
+        ((= dir 3) (+
+            (cond ((not (equal (obtenir-posicio l (- x 1) (- y 1)) 'paret)) 1) (t 0))
+            (cond ((not (equal (obtenir-posicio l (+ x 1) (- y 1)) 'paret)) 1) (t 0))
+        ))
+    )
+)
+
 
 ; Obtiene el valor de una posición en el laberinto
 (defun obtenir-posicio (l x y)
@@ -168,4 +187,4 @@
     )
 )
 
-(print (genera "pruebanueva.txt" 10 10))
+(print (genera "pruebanueva.txt" 25 25))

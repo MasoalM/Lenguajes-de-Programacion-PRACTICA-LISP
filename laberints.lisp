@@ -109,7 +109,7 @@
     (cond
         ((equal (obtenir-posicio l px py) 'sortida) (cls) (print "HAS GANADO") (print nomJugador) (print "EN TAN SOLO") (print n) (print "PASOS") l)
         (t 
-            (setq tecla (get-key))
+            (setq tecla (get-key))  ; PREGUNTAR, ILEGAL? -----------------------------------------------------
             (cond
                 ; si la tecla pulsada es A o flecha izquierda
                 ((and (or (= 65 tecla) (= 97 tecla) (= 331 tecla)) (not (equal (obtenir-posicio l (esquerra px) py) 'paret))) (passa l (esquerra px) py (+ n 1)))
@@ -133,7 +133,8 @@
     ; Pedir nombre al usuario
     (print "Escribe tu nombre, jugador")
     (setq nomJugador (read))
-    (passa (llegeixMatriu (llegeixLaberint nom) 0 0 0) px py 0) 
+    (passa (llegeixMatriu (llegeixLaberint nom) 0 0 0) px py 0)
+    (creaFitxer nom) 
 )
 
 (defun llegeixLaberint (nom) ; lee el laberinto 
@@ -150,7 +151,7 @@
 
 (defun llegeixMatriu (l x y c)
     (cond
-        ((null l) (setq lWidth c) (setq lHeight y) '())
+        ((null l) (setq lWidth c) (setq lHeight c) '())
         (t (cons (llegeixMatriuFila l x y) (llegeixMatriu (salta-fila l) x (+ y 1) (+ c 1))))
     )
 )
@@ -158,7 +159,7 @@
 (defun llegeixMatriuFila (f x y)
     (cond
         ((null f) '())
-        ((equal (car f) #\Newline) '()) ; SETQ SE SOBREESCRIBE Y ESTÁ MAL? ------------------------------------
+        ((equal (car f) #\Newline) '())
         ((equal (car f) #\#) (cons 'paret (llegeixMatriuFila (cdr f) (+ x 1) y)))
         ((equal (car f) #\.) (cons 'cami (llegeixMatriuFila (cdr f) (+ x 1) y)))
         ((equal (car f) #\e) 
@@ -189,7 +190,7 @@
 )
 
 (defun creaFitxer (nomLaberint)
-
+    
 )
 
 (explora "pruebanueva.txt")
