@@ -11,8 +11,6 @@
 (setq xi 20) ; posicion x donde empieza a pintar
 (setq yi 0) ; posicion y donde empieza a pintar 
 (setq m 14)  ; tamaño de un cuadrado
-;(setq lWidth 25) 
-;(setq lHeight 25)
 
 (putprop 'colors '(0 0 0) 'paret)
 
@@ -102,38 +100,99 @@
     )
 )
 
-(defun passa (l px py n)
+(defun passa (l px py n nom)
     (cls)
     (move xi (+ yi (* m lHeight)))
     (pinta l px py)
     (cond
-        ((equal (obtenir-posicio l px py) 'sortida) (cls) (print "HAS GANADO") (print nomJugador) (print "EN TAN SOLO") (print n) (print "PASOS") l)
+        ((equal (obtenir-posicio l px py) 'sortida) (cls) (ordenarScoreboard nomJugador nom n) (format t "HAS GANADO, ~A, EN TAN SOLO ~A PASOS~%" nomJugador n) (mostra-scoreboard nom) l)
         (t 
-            (setq tecla (get-key))  ; PREGUNTAR, ILEGAL? -----------------------------------------------------
+            (setq tecla (get-key)) 
             (cond
                 ; si la tecla pulsada es A o flecha izquierda
-                ((and (or (= 65 tecla) (= 97 tecla) (= 331 tecla)) (not (equal (obtenir-posicio l (esquerra px) py) 'paret))) (passa l (esquerra px) py (+ n 1)))
+                ((and (or (= 65 tecla) (= 97 tecla) (= 331 tecla)) (not (equal (obtenir-posicio l (esquerra px) py) 'paret))) (passa l (esquerra px) py (+ n 1) nom))
                 ; si la tecla pulsada es D o flecha derecha
-                ((and (or (= 68 tecla) (= 100 tecla) (= 333 tecla)) (not (equal (obtenir-posicio l (dreta px) py) 'paret))) (passa l (dreta px) py (+ n 1)))
+                ((and (or (= 68 tecla) (= 100 tecla) (= 333 tecla)) (not (equal (obtenir-posicio l (dreta px) py) 'paret))) (passa l (dreta px) py (+ n 1) nom))
                 ; si la tecla pulsada es W o flecha arriba (irá abajo porque se pinta al revés)
-                ((and (or (= 87 tecla) (= 119 tecla) (= 328 tecla)) (not (equal (obtenir-posicio l px (abaix py)) 'paret))) (passa l px (abaix py) (+ n 1)))
+                ((and (or (= 87 tecla) (= 119 tecla) (= 328 tecla)) (not (equal (obtenir-posicio l px (abaix py)) 'paret))) (passa l px (abaix py) (+ n 1) nom))
                 ; si la tecla pulsada es S o flecha abajo (irá arriba porque se pinta al revés)
-                ((and (or (= 83 tecla) (= 115 tecla) (= 336 tecla)) (not (equal (obtenir-posicio l px (amunt py)) 'paret))) (passa l px (amunt py) (+ n 1)))
+                ((and (or (= 83 tecla) (= 115 tecla) (= 336 tecla)) (not (equal (obtenir-posicio l px (amunt py)) 'paret))) (passa l px (amunt py) (+ n 1) nom))
                 ; si la tecla pulsada es ESC
                 ((= 27 tecla) (cls) l)
                 ; si no, se llama recursivamente tal cual
-                (t (passa l px py n))
+                (t (passa l px py n nom))
             )
         )
     )
-    
 )
+
+(defun ordenarScoreboard (nomJugador nomLaberint pasos)
+  (let* ((fitxer (concatenate 'string (quita-extension nomLaberint) "SB.txt"))
+         (llista-original
+           (let ((fp (open fitxer :direction :input :if-does-not-exist nil)))
+             (cond
+               (fp
+                (let ((resultat (llegeix-scoreboard fp)))
+                  (close fp)
+                  resultat))
+               (t '()))))
+         (llista-ordenada (inserta-ordenat (list nomJugador pasos) llista-original))
+         (fp (open fitxer :direction :output :if-exists :supersede)))
+    (escriu-scoreboard fp llista-ordenada)
+    (close fp)))
+
+(defun quita-extension (nom)
+  (quita-extension-aux nom 0 (- (length nom) 4)))
+
+(defun quita-extension-aux (nom i fin)
+  (cond
+    ((= i fin) "")
+    (t (concatenate 'string
+                    (string (char nom i))
+                    (quita-extension-aux nom (+ i 1) fin)))))
+
+(defun inserta-ordenat (nou llista)
+  (cond
+    ((null llista) (list nou))
+    ((< (cadr nou) (cadr (car llista))) (cons nou llista))
+    (t (cons (car llista) (inserta-ordenat nou (cdr llista))))))
+
+(defun llegeix-scoreboard (fp)
+  (let ((entrada (read fp nil nil)))
+    (cond
+      (entrada (cons entrada (llegeix-scoreboard fp)))
+      (t '()))))
+
+(defun escriu-scoreboard (fp llista)
+  (cond
+    ((null llista) nil)
+    (t
+     (format fp "~S~%" (car llista))
+     (escriu-scoreboard fp (cdr llista)))))
+
+(defun mostra-scoreboard (nomLaberint)
+  (let* ((fitxer (concatenate 'string (quita-extension nomLaberint) "SB.txt"))
+         (fp (open fitxer :direction :input)))
+    (cond
+      (fp
+       (format t "~%--- SCOREBOARD ---~%")
+       (mostra-scoreboard-aux (llegeix-scoreboard fp) 1)
+       (close fp))
+      (t (format t "No hay scoreboard disponible.~%")))))
+
+(defun mostra-scoreboard-aux (llista pos)
+  (cond
+    ((or (null llista) (> pos 10)) nil)  ; para si llegamos a 10 o a fin de lista
+    (t
+     (let ((entrada (car llista)))
+       (format t "~D. ~A - ~A pasos~%" pos (car entrada) (cadr entrada)))
+     (mostra-scoreboard-aux (cdr llista) (+ pos 1)))))
 
 (defun explora (nom)
     ; Pedir nombre al usuario
     (print "Escribe tu nombre, jugador")
     (setq nomJugador (read))
-    (passa (llegeixMatriu (llegeixLaberint nom) 0 0 0) px py 0)
+    (passa (llegeixMatriu (llegeixLaberint nom) 0 0 0) px py 0 nom)
     (creaFitxer nom) 
 )
 
@@ -193,4 +252,4 @@
     
 )
 
-(explora "pruebanueva.txt")
+(explora "pruebanuevanuevanueva.txt")

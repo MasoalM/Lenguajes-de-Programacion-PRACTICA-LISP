@@ -187,4 +187,4 @@
     )
 )
 
-(print (genera "pruebanueva.txt" 25 25))
+(print (genera "pruebanuevanuevanueva.txt" 10 10))
