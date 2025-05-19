@@ -1,15 +1,44 @@
-; Título: Juego Laberinto LISP
+; Título: Laberints (Programa que ejecuta laberintos y permite jugar)
 ; Autores: Marcos Socías Alberto y Hugo Valls Sabater
-; Fecha última modificación: 21/04/2025
+; Fecha última modificación: 19/05/2025
 ; Asignatura: Lenguajes de Programación
 ; Grupo: 102
 ; Profesor teoría: Antoni Oliver Tomàs
 ; Profesor prácticas: Francesc Xavier Gaya Morey
 ; Convocatoria: Ordinaria
-; PONER MÁS TEXTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+; Instrucciones de "creacioLaberints.lisp": Después de cargar el archivo con (load "creacioLaberints.lisp"), para generar un laberinto hay que
+;                                           ejecutar el comando (genera "nombreFichero.txt" anchura altura), siendo "nombreFichero" el nombre que
+;                                           se le quiera designar al nuevo laberinto a crear, "anchura" la cantidad de bloques de largo que tendrá
+;                                           el laberinto y "altura" la cantidad de bloques de alto que tendrá el laberinto.
+; Instrucciones de "laberints.lisp": Después de cargar el archivo con (load "laberints.lisp"), para empezar la partida hay que escribir
+;                                    el comando (explora "nombreFichero.txt") y el juego comenzará. Hay que tener en cuenta que el fichero
+;                                    seleccionado para cargar, tiene que existir.
+; Aspectos opcionales "creacioLaberints.lisp": 
+;  ->  "Millor gestió dels cantons a les parets interiors: evitar que es generin parets diagonals": Como se puede comprobar, hemos evitado que se generen
+;       paredes diagonales, esto ha sido gracias a crear una condición extra para utilizar en nuestra función "crea-cami", es decir, ahora es más restrictivo
+;       a la hora de crear caminos ya que hay más condiciones. Esta función es "contador-esquines-veines", básicamente primero comprueba hacia dónde nos queremos mover
+;       y una vez lo sabe, mira que no haya camino en las dos esquinas en la dirección hacia donde se mueve (las que tiene atrás no las comprueba ya que no es necesario). 
+;       Si no son pared, suma 1 y por tanto ya no es 0 el número de caminos cercanos prohibidos y no crea el camino.
+;  ->  "Generació de laberints de mides superiors (per exemple, fins a 50x50).": Se puede comprobar que el comando (genera "nomFitxer.txt" 50 50) funciona y crea
+;       un fichero de texto correcto. Antes de implementar la mejora de generar las paredes diagonales no funcionaba ya que teníamos demasiados caminos de posibilidades 
+;       abiertas a la vez, pero gracias a podar más ramas con contador-esquines-veines ya funciona.
+; Aspectos opcionales "laberints.lisp":
+;  ->  "Gestió de les diferents mides dels laberints que s’hagin generat.": En llegeixMatriu, ejecutamos las dos siguientes instrucciones "(setq lWidth c) (setq lHeight c)",
+;        estas nos permiten adaptar la lectura del laberinto a las dimensiones que tenga el fichero ya que la almacenamos con setq.
+; Explicación diseño "creacioLaberints.lisp": Todo se basa en la función "genera" que se encarga de generar todo el fichero. Empieza asignando valores constantes (no los modificaremos)
+;                                             y luego llama a funciones que están unas dentro de otras. Empieza creando la matriz con crea-matriu, esa matriz la utiliza para crearle
+;                                             el camino con crea-cami (algoritmo DFS), luego crea la salida en otra posición random con crea-sortida. Seguidamente, se llama a generaContingut 
+;                                             para que traduzca el laberinto de nuestra matriz a los símbolos que queremos meter en nuestro archivo de texto y finalmente se llama a escriuLaberint
+;                                             para que se guarde el laberinto en un .txt. Durante este proceso se utilizan funciones auxiliares que están explicadas con sus correspondientes
+;                                             comentarios y por otro lado también hemos explicado los extras anteriormente en este bloque de comentarios.
+; Explicación diseño "laberints.lisp": La función inicial es "explora", que pide el nombre al jugador y llama a la función "passa" pasándole la matriz leída gracias a llegeixLaberint
+;                                      (lee el fichero) y llegeixMatriu (adapta el formato del fichero y crea una matriz con valores). "Passa", se actualiza cada vez que el jugador hace
+;                                      un movimiento, además de limpiar y pintar la pantalla en cada iteración. Finalmente, passa comprueba si el jugador está en la casilla final
+;                                      para finalizar la partida, ordenar y mostrar el scoreboard con sus respectivas funciones. Durante este proceso se utilizan funciones auxiliares que 
+;                                      están explicadas con sus correspondientes comentarios y por otro lado también hemos explicado los extras anteriormente en este bloque de comentarios.                                           
 
-(setq xi 20) ; posicion x donde empieza a pintar
-(setq yi 0) ; posicion y donde empieza a pintar 
+(setq xi 20) ; posición x donde empieza a pintar
+(setq yi 0) ; posición y donde empieza a pintar 
 (setq m 14)  ; tamaño de un cuadrado
 
 (putprop 'colors '(0 0 0) 'paret)
@@ -105,7 +134,7 @@
     (move xi (+ yi (* m lHeight)))
     (pinta l px py)
     (cond
-        ((equal (obtenir-posicio l px py) 'sortida) (cls) (ordenarScoreboard nomJugador nom n) (format t "HAS GANADO, ~A, EN TAN SOLO ~A PASOS~%" nomJugador n) (mostra-scoreboard nom) l)
+        ((equal (obtenir-posicio l px py) 'sortida) (cls) (ordenarScoreboard nomJugador nom n) (format t "HAS GANADO, ~A, EN TAN SOLO ~A PASOS~%" nomJugador n) (mostra-scoreboard nom))
         (t 
             (setq tecla (get-key)) 
             (cond
@@ -118,7 +147,7 @@
                 ; si la tecla pulsada es S o flecha abajo (irá arriba porque se pinta al revés)
                 ((and (or (= 83 tecla) (= 115 tecla) (= 336 tecla)) (not (equal (obtenir-posicio l px (amunt py)) 'paret))) (passa l px (amunt py) (+ n 1) nom))
                 ; si la tecla pulsada es ESC
-                ((= 27 tecla) (cls) l)
+                ((= 27 tecla) (cls))
                 ; si no, se llama recursivamente tal cual
                 (t (passa l px py n nom))
             )
@@ -193,7 +222,6 @@
     (print "Escribe tu nombre, jugador")
     (setq nomJugador (read))
     (passa (llegeixMatriu (llegeixLaberint nom) 0 0 0) px py 0 nom)
-    (creaFitxer nom) 
 )
 
 (defun llegeixLaberint (nom) ; lee el laberinto 
@@ -248,8 +276,4 @@
     )  
 )
 
-(defun creaFitxer (nomLaberint)
-    
-)
-
-(explora "pruebanuevanuevanueva.txt")
+;(explora "prueba.txt")
