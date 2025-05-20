@@ -39,6 +39,15 @@
 
 (setq rs (make-random-state t))
 
+;------------------------------------------------------------------------
+;FUNCION : genera 
+;DESCRIPCIO: genera el laberinto completo
+;            
+;PARAM: nom : nombre del archivo donde se guardara el laberinto
+;       x : ancho del laberinto
+;       y : alto del laberinto
+;------------------------------------------------------------------------
+
 (defun genera (nom x y)
     (setq lWidth x)
     (setq lHeight y)
@@ -49,10 +58,25 @@
     (escriuLaberint nom (generaContingut (crea-sortida (crea-cami (crea-matriu 0 lWidth lHeight) actualX actualY (crea-llista-random '())))))
 )
 
-; algoritmo DFS
+;------------------------------------------------------------------------
+;FUNCION : crea-cami
+;DESCRIPCIO: crea el camino principal del laberinto utilizando DFS.
+;            comprueba las 4 posiciones posibles sobre las que poder 
+;            realizar el proximo movimiento y lo elige segun criterios  
+;            que dependen de funciones explicadas mas adelante.
+;PARAM: m : matriz actual del laberinto
+;       x , y : posicion actual
+;       r : lista aleatoria de direcciones a explorar
+;------------------------------------------------------------------------
 (defun crea-cami (m x y r)
     (cond
         ((null r) m)
+        ;en caso de ser r ==0  ( derecha ) [funciona igual para los  movimientos posibles]
+        ;comprobamos si el camino por el que venimos es el unico camino que hay en las 4 posiciones que comprobamos,
+        ;comprobamos que no generariamos una pared diagonal
+        ;comprobamos que la posicion en la que nos encontramos se trata de una pared
+        ;comprobamos que no nos estamos saliendo del laberinto
+        ; si todo eso se cumple se cambia la pared por camino y seguimos con el dfs desde esa posicion
         ((and (= (car r) 0) (= (contador-camins-veins m (+ x 1) y) 1) (= (contador-esquines-veines m (+ x 1) y 0) 0) (equal (obtenir-posicio m (+ x 1) y) 'paret) (limites (+ x 1) y))
             (crea-cami (crea-cami (actualitza-posicio m (+ x 1) y 'cami) (+ x 1) y (crea-llista-random '())) x y (cdr r)))
         ((and (= (car r) 1) (<= (contador-camins-veins m (- x 1) y) 1) (= (contador-esquines-veines m (- x 1) y 1) 0) (equal (obtenir-posicio m (- x 1) y) 'paret) (limites (- x 1) y))
@@ -65,6 +89,14 @@
     )
 )
 
+;------------------------------------------------------------------------
+;FUNCION : crea-sortida
+;DESCRIPCIO: coloca la salida en una celda aleatoria que sea un "cami"
+;            
+;PARAM: m : matriz del laberito (ya generado)
+;       
+;
+;------------------------------------------------------------------------
 (defun crea-sortida (m)
     (setq randomX (+ (random (- lWidth 2) rs) 1))
     (setq randomY (+ (random (- lHeight 2) rs) 1))
@@ -74,12 +106,27 @@
     )
 )
 
-; Función que verifica si una posición está dentro de los límites del laberinto
+;------------------------------------------------------------------------
+;FUNCION : limites
+;DESCRIPCIO: funcion que verifica si una posicion esta dentro de 
+;            los limites del laberinto
+;            
+;PARAM: x, y : coordenadas a comprobar 
+;       
+;
+;------------------------------------------------------------------------
 (defun limites (x y)
     (and (> x 0) (> y 0) (< x lWidth) (< y lHeight))
 )
 
-; Función que actualiza el tipo de una celda del laberinto en la posición dada
+;------------------------------------------------------------------------
+;FUNCION : actualizar-posicio
+;DESCRIPCIO: funcion que actualiza el valor de una celda en una posicion 
+;            dada dentro del laberinto
+;PARAM: l : lista de listas del laberinto
+;       x , y : coordenadas de la celda a actualizar
+;       nou-valor : nuevo valor por el que se debe cambiar
+;------------------------------------------------------------------------
 (defun actualitza-posicio (l x y nou-valor)
     (cond
         ((null l) nil)
@@ -87,7 +134,15 @@
         (t (cons (car l) (actualitza-posicio (cdr l) x (- y 1) nou-valor)))
     )
 )
-; Función que actualiza el tipo de una celda en una fila
+
+;------------------------------------------------------------------------
+;FUNCION : actualizar-posicion-fila
+;DESCRIPCIO: actualizamos una celda dentro de una fila
+;            
+;PARAM: fila : lista que representa una fula dentro del laberinto
+;       x : indice de la celda a modificar
+;       nou-valor : nuevo alor por el que se debe cambiar
+;------------------------------------------------------------------------
 (defun actualitza-posicio-fila (fila x nou-valor)
     (cond
         ((null fila) nil)
@@ -95,14 +150,31 @@
         (t (cons (car fila) (actualitza-posicio-fila (cdr fila) (- x 1) nou-valor)))
     )
 )
-; genera una lista de direcciones aleatorias para el recorrido
+
+;------------------------------------------------------------------------
+;FUNCION : crea-llista-random
+;DESCRIPCIO: crea una lista aleatoria de direcciones que usamos apra que 
+;            el dfs sea lo mas aleatorio posible.
+;PARAM: l : lista actual de firecciones ( se llama recursivamente 
+;           hasta contener los 4 elementos posibles )
+;       
+;
+;------------------------------------------------------------------------
 (defun crea-llista-random (l)
     (cond
         ((and (pertany 0 l) (pertany 1 l) (pertany 2 l) (pertany 3 l)) (fer-conjunt l))
         (t (crea-llista-random (cons (random 4 rs) l)))
     )
 )
-; verifica si un elemento pertenece a una lista
+
+;------------------------------------------------------------------------
+;FUNCION : pertany
+;DESCRIPCIO: comprueba si un elemento pertenece a una lista
+;            
+;PARAM: x : elemento que buscamos
+;       l : lista donde buscamos
+;
+;------------------------------------------------------------------------
 (defun pertany (x l)
     (cond 
         ((null l) nil)
@@ -110,7 +182,15 @@
         (t (pertany x (cdr l)))
     )
 )
-;  elimina los elementos duplicados en una lista (lo usamos para la lista random)
+
+;------------------------------------------------------------------------
+;FUNCION : fer-conjunt
+;DESCRIPCIO: elimina los sobrantes de la lista de tal forma que tenemos
+;            un orden aleatorio de los 4 elementos iniciales.
+;PARAM: l : lista de elementos
+;       
+;
+;------------------------------------------------------------------------
 (defun fer-conjunt (l)
     (cond 
         ((null l) nil)
@@ -118,8 +198,16 @@
         (t (cons (car l) (fer-conjunt(cdr l))))
     )
 )
-; comprueba si estamos en un camino legal, mirando el tipo de casillas vecinas
-; MEJORAR PORQUE SOLO USA UN COND Y SALE
+
+;------------------------------------------------------------------------
+;FUNCION : contador-camins-veins 
+;DESCRIPCIO: comprueba si es posible avanzar en ciertas direcciones 
+;            contando cuantos elementos de al rededor no son pared de 
+;            cierta posicion
+;PARAM: l : matriz del laberinto (en proceso)
+;       x , y : coordenadas a analizar
+;
+;------------------------------------------------------------------------
 (defun contador-camins-veins (l x y)
     (+  (cond ((not (equal (obtenir-posicio l (+ x 1) y) 'paret)) 1) (t 0))
         (cond ((not (equal (obtenir-posicio l (- x 1) y) 'paret)) 1) (t 0))
@@ -128,6 +216,15 @@
     )
 )
 
+;------------------------------------------------------------------------
+;FUNCION : contador-esquines-veines
+;DESCRIPCIO: comprueba si es posible avanzar en ciertas direcciones 
+;            dependiendo de cuantos elementos de al rededor son paredes
+;            o no ( mejora para evitar paredes diagonales)
+;PARAM: l : matriz del laberinto (en proceso)
+;       x , y : coordenadas a analizar
+;       dir : direccion que se esta evaluando 
+;------------------------------------------------------------------------
 (defun contador-esquines-veines (l x y dir)
     (cond
         ; DERECHA (0)
@@ -153,29 +250,59 @@
     )
 )
 
-
-; Obtiene el valor de una posición en el laberinto
+;------------------------------------------------------------------------
+;FUNCION : obtenir-posicio
+;DESCRIPCIO: obtiene el valor de una celda del laberinto dada su posicion
+;                       
+;PARAM: l : matriz del laberinto
+;       x , y : coordenadas de la posicion
+;       
+;------------------------------------------------------------------------
 (defun obtenir-posicio (l x y)
     (cond
         ((<= y 0) (obtenir-posicio-exacta (car l) x))
         (t (obtenir-posicio (cdr l) x (- y 1)))
     )
 )
-; Obtiene el valor exacto de una posición en una fila
+
+;------------------------------------------------------------------------
+;FUNCION : obtenir-posicio-exacta
+;DESCRIPCIO: obtenre el valor dentro de una fila
+;                        
+;PARAM: l : fila del laberinto
+;       x : indice de la celda a obtener dentro de la fila
+;       
+;------------------------------------------------------------------------
 (defun obtenir-posicio-exacta (l x)
     (cond
         ((<= x 0) (car l))
         (t (obtenir-posicio-exacta (cdr l) (- x 1)))
     )
 )
-; Crea una matriz de tamaño lHeight con filas vacías
+
+;------------------------------------------------------------------------
+;FUNCION : crea-matriu
+;DESCRIPCIO: crea una matriz segun los valores de entrada
+;                        
+;PARAM: altura : altura que debe tener la matriz
+;       anchura : anchura que debe tener la matriz
+;       y : contador de filas creadas
+;------------------------------------------------------------------------
 (defun crea-matriu (y anchura altura)
     (cond
         ((= y altura) '())
         (t (cons (crea-fila 0 anchura y) (crea-matriu (+ y 1) anchura altura)))
     )
 )
-; Crea una fila de celdas llena de paredes
+
+;------------------------------------------------------------------------
+;FUNCION : crea-fila
+;DESCRIPCIO:  crea una fila de paredes de longitud anchura , a menos que
+;             la posicion sea la de entrada           
+;PARAM: x : contador de columnas creadas
+;       y : indice de la fila actual
+;       anchura : numero de columnas en la fila
+;------------------------------------------------------------------------
 (defun crea-fila (x anchura y)
     (cond
         ((= x anchura) '())
@@ -183,14 +310,30 @@
         (t (cons 'paret (crea-fila (+ x 1) anchura y)))
     )
 )
-; Función que genera el contenido del laberinto 
+
+;------------------------------------------------------------------------
+;FUNCION : generaContingut
+;DESCRIPCIO: convierte la amtriz generada en una lista de caracteres 
+;            para almacenar.            
+;PARAM: m : matriz del laberinto
+;       
+;       
+;------------------------------------------------------------------------ 
 (defun generaContingut (m)
   (cond
     ((null m) '())
     (t (append (generaContingutFila (car m)) (generaContingut (cdr m))))
   )
 )
-; Según el tipo de casilla añadimos una serie de caracteres al archivo
+
+;------------------------------------------------------------------------
+;FUNCION : generaContingutFila
+;DESCRIPCIO: se traduce el simbolo a los caracteres que seran almacenados
+;                        
+;PARAM: fila : lista de simbolos a traducir
+;       
+;       
+;------------------------------------------------------------------------
 (defun generaContingutFila (fila)
   (cond
     ((null fila) (list #\Newline))
@@ -201,7 +344,15 @@
     (t                            (cons #\? (generaContingutFila (cdr fila))))
   )
 )
-; Escribe el contenido generado en un archivo especificado
+
+;------------------------------------------------------------------------
+;FUNCION : escriuLaberint
+;DESCRIPCIO: escribe el contenido del labeirnto en un archivo de nombre "nom"
+;                        
+;PARAM: nom : nombre del archivo donde almacenamos el contenido
+;       contingut : lista de caracteres a escribir
+;       
+;------------------------------------------------------------------------
 (defun escriuLaberint (nom contingut)  
     (let ((fp (open nom :direction :output)))
         (escriu-intern fp contingut)
@@ -209,10 +360,18 @@
     )
 )
 
+;------------------------------------------------------------------------
+;FUNCION : escriu-intern
+;DESCRIPCIO: escribe la lista de caracteres en un fichero
+;                        
+;PARAM: fp : file pointer
+;       contingut : lista de caracteres a escribir
+;       
+;------------------------------------------------------------------------
 (defun escriu-intern (fp contingut)
     (cond ((null contingut) nil)
         (t (write-char (car contingut) fp) (escriu-intern fp (cdr contingut)))
     )
 )
 
-;(print (genera "prueba.txt" 25 25))
+(print (genera "prueba.txt" 25 25))
