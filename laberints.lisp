@@ -1,11 +1,13 @@
 ; Título: Laberints (Programa que ejecuta laberintos y permite jugar)
 ; Autores: Marcos Socías Alberto y Hugo Valls Sabater
-; Fecha última modificación: 19/05/2025
+; Fecha última modificación: 24/05/2025
 ; Asignatura: Lenguajes de Programación
 ; Grupo: 102
 ; Profesor teoría: Antoni Oliver Tomàs
 ; Profesor prácticas: Francesc Xavier Gaya Morey
 ; Convocatoria: Ordinaria
+; Instrucciones generales: Es importante tener en cuenta que hay que usar cada método justo después de haber cargado su respectivo archivo. No se puede generar mapas
+;                          después de haber cargado "laberints.lisp" a no ser que se vuelva a cargar "creacioLaberints.lisp".
 ; Instrucciones de "creacioLaberints.lisp": Después de cargar el archivo con (load "creacioLaberints.lisp"), para generar un laberinto hay que
 ;                                           ejecutar el comando (genera "nombreFichero.txt" anchura altura), siendo "nombreFichero" el nombre que
 ;                                           se le quiera designar al nuevo laberinto a crear, "anchura" la cantidad de bloques de largo que tendrá
@@ -39,7 +41,7 @@
 
 (setq xi 20) ; posición x donde empieza a pintar
 (setq yi 0) ; posición y donde empieza a pintar 
-(setq m 14)  ; tamaño de un cuadrado
+(setq m 12)  ; tamaño de un cuadrado
 
 (putprop 'colors '(0 0 0) 'paret)
 
@@ -52,10 +54,10 @@
 (putprop 'colors '(0 0 255) 'entrada)
 
 ;------------------------------------------------------------------------
-;FUNCION : quadrat
-;DESCRIPCIO: dibuja un cuadrado de dimensiones m^2 pixeles que tomaran el 
+;FUNCIÓN : quadrat
+;DESCRIPCIÓN: dibuja un cuadrado de dimensiones m^2 pixeles que tomarán el 
 ;            papel de cada celda del laberinto.
-;PARAM: X : control de repeticiones dentro de la funcion
+;PARAM: X : control de repeticiones dentro de la función
 ;       M : tamaño del lado del cuadrado 
 ;
 ;------------------------------------------------------------------------
@@ -69,8 +71,8 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : fila-quadrats
-;DESCRIPCIO: Dibuja una fila de cuadrados, 
+;FUNCIÓN : fila-quadrats
+;DESCRIPCIÓN: Dibuja una fila de cuadrados, 
 ;            representando cada celda del laberinto
 ;PARAM: N : número de celdas a pintar en la fila
 ;       L : contenido de la celda
@@ -98,8 +100,8 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : pinta
-;DESCRIPCIO: pinta el laberinto fila a fila
+;FUNCIÓN : pinta
+;DESCRIPCIÓN: pinta el laberinto fila a fila
 ;            
 ;PARAM: L : matriz del laberinto
 ;       PX y PY : coordenadas del jugador
@@ -118,8 +120,8 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : obtenir-posicio
-;DESCRIPCIO: devuelve la posicion referenciada de la matriz
+;FUNCIÓN : obtenir-posicio
+;DESCRIPCIÓN: devuelve la posición referenciada de la matriz
 ;            
 ;PARAM: L : matriz del laberinto
 ;       X : columna
@@ -133,11 +135,11 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : obtenir-posicio-exacta 
-;DESCRIPCIO: devuelve el elemento numero x de una lista
+;FUNCIÓN : obtenir-posicio-exacta 
+;DESCRIPCIÓN: devuelve el elemento número x de una lista
 ;            
 ;PARAM: L : lista  (que viene a ser la fila de la matriz)
-;       X : la posicion que se desea obtener.
+;       X : la posición que se desea obtener.
 ;
 ;------------------------------------------------------------------------
 (defun obtenir-posicio-exacta (l x)
@@ -148,10 +150,10 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : dreta, esquerra, amunt y abaix
-;DESCRIPCIO: calcula la posicion adyacente (cada una en el sentido indicado)
+;FUNCIÓN : dreta, esquerra, amunt y abaix
+;DESCRIPCIÓN: calcula la posición adyacente (cada una en el sentido indicado)
 ;            
-;PARAM: PX o PY : posicion x o y actual del jugador
+;PARAM: PX o PY : posición x o y actual del jugador
 ;       
 ;
 ;------------------------------------------------------------------------
@@ -178,16 +180,15 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : passa
-;DESCRIPCIO: controla el movimiento del jugador en cada accion que toma
+;FUNCIÓN : passa
+;DESCRIPCIÓN: controla el movimiento del jugador en cada acción que toma
 ;            y gestiona la victoria.
 ;PARAM: L  : matriz del laberinto
-;       PX y PY : posicion actual jugador 
-;       N : numero de pasos que ha dado hasta ese momento
+;       PX y PY : posición actual jugador 
+;       N : número de pasos que ha dado hasta ese momento
 ;       nom : nombre que se le ha dado al laberinto
 ;------------------------------------------------------------------------
 (defun passa (l px py n nom)
-    (cls)
     (move xi (+ yi (* m lHeight)))
     (pinta l px py)
     (cond
@@ -213,12 +214,12 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : ordenarScoreboard
-;DESCRIPCIO: ordena e inserta el resultado del jugador en el fichero de ScoreBoard
+;FUNCIÓN : ordenarScoreboard
+;DESCRIPCIÓN: ordena e inserta el resultado del jugador en el fichero de ScoreBoard
 ;            
 ;PARAM: nomJugador: nombre del jugador actual
 ;       nomLaberint: nombre del fichero del laberinto jugado
-;       pasos: cantidad de pasos que tardó en completar el laberinto
+;       pasos: cantidad de pasos que tardó el jugador en completar el laberinto
 ;------------------------------------------------------------------------
 (defun ordenarScoreboard (nomJugador nomLaberint pasos)
   (let* ((fitxer (concatenate 'string (quita-extension nomLaberint) "SB.txt"))
@@ -236,10 +237,10 @@
     (close fp)))
 
 ;------------------------------------------------------------------------
-;FUNCION : quita-extension
-;DESCRIPCIO: "devuelve" el nombre del fichero que se le pasa sin el .txt final
+;FUNCIÓN : quita-extension
+;DESCRIPCIÓN: "devuelve" el nombre del fichero que se le pasa sin el .txt final,
 ;            para poder crear otro con el mismo nombre pero con el SB.txt
-;PARAM: nom : nomrbe del fichero original
+;PARAM: nom : nombre del fichero original
 ;       
 ;
 ;------------------------------------------------------------------------
@@ -247,12 +248,12 @@
   (quita-extension-aux nom 0 (- (length nom) 4)))
 
 ;------------------------------------------------------------------------
-;FUNCION : quita-extension-aux
-;DESCRIPCIO: auxiliar para guardar el nombre original sin la extension
+;FUNCIÓN : quita-extension-aux
+;DESCRIPCIÓN: auxiliar para guardar el nombre original sin la extensión
 ;            
 ;PARAM: nom : nombre original
-;       i   : indice actual
-;       fin : indice hasta donde quieres copiar 
+;       i   : índice actual
+;       fin : índice hasta donde quieres copiar 
 ;------------------------------------------------------------------------  
 (defun quita-extension-aux (nom i fin)
   (cond
@@ -262,8 +263,8 @@
                     (quita-extension-aux nom (+ i 1) fin)))))
 
 ;------------------------------------------------------------------------
-;FUNCION : inserta-ordenat
-;DESCRIPCIO: inserta un nuevo elemento ( nombre del jugador y los pasos realizados)
+;FUNCIÓN : inserta-ordenat
+;DESCRIPCIÓN: inserta un nuevo elemento (nombre del jugador y los pasos realizados)
 ;            en la lista ordenada del SB
 ;PARAM: nou : lista con el nombre del jugador y los pasos
 ;       llista : lista ya existente de resultados previos
@@ -276,8 +277,8 @@
     (t (cons (car llista) (inserta-ordenat nou (cdr llista))))))
 
 ;------------------------------------------------------------------------
-;FUNCION : llegeix-scoreboard
-;DESCRIPCIO: lee el contenido del fichero SB
+;FUNCIÓN : llegeix-scoreboard
+;DESCRIPCIÓN: lee el contenido del fichero SB
 ;            
 ;PARAM: fp : file pointer del archivo abierto       
 ;
@@ -289,8 +290,8 @@
       (t '()))))
 
 ;------------------------------------------------------------------------
-;FUNCION : escriu-scoreboard
-;DESCRIPCIO: Escribe las puntuaciones ordenadas en el fichero SB
+;FUNCIÓN : escriu-scoreboard
+;DESCRIPCIÓN: Escribe las puntuaciones ordenadas en el fichero SB
 ;            
 ;PARAM: fp : file pointer del archivo abierto 
 ;       llista : lista ordenada con los datos de los jugadores
@@ -304,11 +305,11 @@
      (escriu-scoreboard fp (cdr llista)))))
 
 ;------------------------------------------------------------------------
-;FUNCION : mostra-scoreboard
-;DESCRIPCIO: muestra los 10 mejores resultados del archivo SB por pantalla
-;            (anuncia que los va a imprimir , realmente 
-;            los imprime su funcion aux)
-;PARAM: nomLaberint : nombre del archivo del laberinto en cuestion
+;FUNCIÓN : mostra-scoreboard
+;DESCRIPCIÓN: muestra los 10 mejores resultados del archivo SB por pantalla
+;            (anuncia que los va a imprimir, realmente 
+;            los imprime su función aux)
+;PARAM: nomLaberint : nombre del archivo del laberinto en cuestión
 ;       
 ;
 ;------------------------------------------------------------------------  
@@ -323,11 +324,11 @@
       (t (format t "No hay scoreboard disponible.~%")))))
 
 ;------------------------------------------------------------------------
-;FUNCION : mostra-scoreboard-aux
-;DESCRIPCIO: imprime por pantalla los 10 mejores resultados o en su defecto
+;FUNCIÓN : mostra-scoreboard-aux
+;DESCRIPCIÓN: imprime por pantalla los 10 mejores resultados o en su defecto
 ;            todos los que haya en ese momento
 ;PARAM: llista : lista de jugadores y pasos
-;       pos : posicion en el ranking del 1 al 10
+;       pos : posición en el ranking del 1 al 10
 ;
 ;------------------------------------------------------------------------ 
 (defun mostra-scoreboard-aux (llista pos)
@@ -339,8 +340,8 @@
      (mostra-scoreboard-aux (cdr llista) (+ pos 1)))))
 
 ;------------------------------------------------------------------------
-;FUNCION : explora
-;DESCRIPCIO: le pide el nombre al jugador e inicia el juego
+;FUNCIÓN : explora
+;DESCRIPCIÓN: le pide el nombre al jugador e inicia el juego
 ;            
 ;PARAM: nom : nombre del fichero de laberinto
 ;       
@@ -350,12 +351,13 @@
     ; Pedir nombre al usuario
     (print "Escribe tu nombre, jugador")
     (setq nomJugador (read))
+    (cls)
     (passa (llegeixMatriu (llegeixLaberint nom) 0 0 0) px py 0 nom)
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : llegeixLaberint
-;DESCRIPCIO: lee el fichero del laberinto 
+;FUNCIÓN : llegeixLaberint
+;DESCRIPCIÓN: lee el fichero del laberinto 
 ;            
 ;PARAM: nom : nombre del fichero del laberinto
 ;       
@@ -366,8 +368,8 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : llegeix-intern
-;DESCRIPCIO: lee caracter a caracter un fichero y lo guarda en una lista
+;FUNCIÓN : llegeix-intern
+;DESCRIPCIÓN: lee caracter a caracter un fichero y lo guarda en una lista
 ;            
 ;PARAM: fp : file pointer
 ;       
@@ -382,8 +384,8 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : llegeixMatriu
-;DESCRIPCIO: crea una matriz de simbolos con los caracteres del fichero
+;FUNCIÓN : llegeixMatriu
+;DESCRIPCIÓN: crea una matriz de símbolos con los caracteres del fichero
 ;            
 ;PARAM: l : lista de caracteres
 ;       x : contador para las columnas 
@@ -398,13 +400,13 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : llegeixMatriuFila
-;DESCRIPCIO: traduce las listas de caracteres del fichero 
-;            en simbolos del laberinto
+;FUNCIÓN : llegeixMatriuFila
+;DESCRIPCIÓN: traduce las listas de caracteres del fichero 
+;            en símbolos del laberinto
 ;            
 ;PARAM: f : lista de caracteres
-;       x : posicion actual x
-;       y : posicion actual y
+;       x : posición actual x
+;       y : posición actual y
 ;------------------------------------------------------------------------
 (defun llegeixMatriuFila (f x y)
     (cond
@@ -414,8 +416,8 @@
         ((equal (car f) #\.) (cons 'cami (llegeixMatriuFila (cdr f) (+ x 1) y)))
         ((equal (car f) #\e) 
             ; almacenar posición inicial jugador y asignar valor a las variables px y py
-            (setq px x) ; posicion inicial x en la matriz del jugador   
-            (setq py y) ; posicion inicial y en la matriz del jugador
+            (setq px x) ; posición inicial x en la matriz del jugador   
+            (setq py y) ; posición inicial y en la matriz del jugador
             (cons 'entrada (llegeixMatriuFila (cdr f) (+ x 1) y))
         )
         ((equal (car f) #\s) (cons 'sortida (llegeixMatriuFila (cdr f) (+ x 1) y)))
@@ -424,8 +426,8 @@
 )
 
 ;------------------------------------------------------------------------
-;FUNCION : salta - fila
-;DESCRIPCIO: salta al inicio de la siguiente fila del fichero
+;FUNCIÓN : salta-fila
+;DESCRIPCIÓN: salta al inicio de la siguiente fila del fichero
 ;            
 ;PARAM: l : lista de caracteres
 ;       
@@ -439,4 +441,4 @@
     )
 )
 
-(explora "prueba.txt")
+;(explora "prueba.txt")
